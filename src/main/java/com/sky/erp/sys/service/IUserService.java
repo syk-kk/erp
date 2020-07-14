@@ -3,6 +3,8 @@ package com.sky.erp.sys.service;
 import com.sky.erp.sys.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -13,5 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserService extends IService<User> {
     public void saveRoleUser(Integer uid,Integer[] rids);
+    public List<Integer> getHasRoleIdsByUid(Integer uid);
 
 }

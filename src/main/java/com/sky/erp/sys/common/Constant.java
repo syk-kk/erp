@@ -43,4 +43,9 @@ public interface Constant {
      */
     public static final Integer USER_TYPE_SUPPER = 0;
     public static final Integer USER_TYPE_NORMAL = 1;
+
+    /**
+     * 用户默认密码
+     */
+    public static final String USER_DEFAULT_PWD = "123456";
 }

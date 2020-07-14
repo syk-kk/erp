@@ -9,4 +9,8 @@
         insert into sys_role_user(uid,rid) values (#{uid},#{rid})
     </insert>
 
+    <select id="getHasRoleIdsByUid" resultType="integer">
+        select rid from sys_role_user where uid=#{uid}
+    </select>
+
 </mapper>

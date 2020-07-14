@@ -1,6 +1,9 @@
 package com.sky.erp.sys.controller;
 
 
+import cn.hutool.core.comparator.PinyinComparator;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,16 +12,24 @@ import com.sky.erp.sys.common.DataGridView;
 import com.sky.erp.sys.common.ResultObj;
 import com.sky.erp.sys.entity.Dept;
 import com.sky.erp.sys.entity.Permission;
+import com.sky.erp.sys.entity.Role;
 import com.sky.erp.sys.entity.User;
 import com.sky.erp.sys.service.IDeptService;
+import com.sky.erp.sys.service.IRoleService;
 import com.sky.erp.sys.service.IUserService;
 import com.sky.erp.sys.vo.UserVo;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +51,9 @@ public class UserController {
 
     @Autowired
     private IDeptService deptService;
+
+    @Autowired
+    private IRoleService roleService;
     /*
     查询所有除超级管理员外的用户
      */
@@ -78,11 +92,37 @@ public class UserController {
     @RequestMapping("selectRole")
     public ResultObj selectRole(Integer uid,Integer[] rids){
         try {
+
             userService.saveRoleUser(uid,rids);
             return ResultObj.DISPATCH_SUCCESS;
         } catch (Exception e){
             return ResultObj.DISPATCH_ERROR;
         }
+    }
+
+    /**
+     * 加载用户已拥有的角色
+     */
+    @RequestMapping("loadHasRole")
+    public DataGridView loadHasRole(Integer id){
+        List<Role> data = new ArrayList<>();
+        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("available",Constant.AVAILABLE_TRUE);
+        List<Role> allRole = roleService.list(queryWrapper);
+        List<Integer> hasRids = userService.getHasRoleIdsByUid(id);
+        for (Role role : allRole) {
+            Boolean flag = false;
+            for (Integer rid : hasRids) {
+                if (role.getId()==rid){
+                    flag = true;
+                    break;
+                }
+            }
+            role.setLAY_CHECKED(flag);
+            data.add(role);
+        }
+        return new DataGridView(data);
+
     }
 
     /**
@@ -110,6 +150,77 @@ public class UserController {
         Map<String,Object> map = new HashMap<>();
         map.put("ordernum",userService.getOne(queryWrapper).getOrdernum()+1);
         return map;
+    }
+
+    /**
+     * 根据deptid加载用户
+     */
+    @RequestMapping("loadUsersByDeptId")
+    public DataGridView loadUsersByDeptId(Integer deptid){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("deptid",deptid);
+        queryWrapper.eq("type",Constant.USER_TYPE_NORMAL);
+        queryWrapper.eq("available",Constant.AVAILABLE_TRUE);
+        List<User> users = userService.list(queryWrapper);
+        return new DataGridView(users);
+    }
+
+    /**
+     * 添加用户
+     */
+    @RequestMapping("addUser")
+    public ResultObj addUser(User user){
+        try {
+            if (user.getAvailable()==null){
+                user.setAvailable(0);
+            }
+            user.setType(Constant.USER_TYPE_NORMAL);
+            String salt = IdUtil.simpleUUID().toUpperCase();
+            user.setSalt(salt);
+            user.setPwd(new Md5Hash(Constant.USER_DEFAULT_PWD,salt,2).toString());
+            userService.save(user);
+            return ResultObj.ADD_SUCCESS;
+        } catch (Exception e){
+            return ResultObj.ADD_ERROR;
+        }
+    }
+
+    /**
+     * 中文转拼音
+     */
+    @RequestMapping("ChineseToPinyin")
+    public Map<String,Object> ChineseToPinyin(String username){
+
+        Map<String,Object> map = new HashMap<>();
+        try {
+
+//          设置转换后拼音显示的格式
+            HanyuPinyinOutputFormat outputFormat = new HanyuPinyinOutputFormat();
+//          拼音不带音标
+            outputFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+//          将中文字符串转成拼音
+            String s = PinyinHelper.toHanYuPinyinString(username, outputFormat, "", true);
+            map.put("value",s);
+        } catch (BadHanyuPinyinOutputFormatCombination e){
+            map.put("value","");
+        }
+
+        return map;
+    }
+
+    /**
+     * 重置用户密码
+     */
+    @RequestMapping("resetUserPwd")
+    public ResultObj resetUserPwd(Integer id){
+        try {
+            User user = userService.getById(id);
+            user.setPwd(new Md5Hash(Constant.USER_DEFAULT_PWD,user.getSalt(),2).toString());
+            userService.updateById(user);
+            return ResultObj.RESET_SUCCESS;
+        } catch (Exception e){
+            return ResultObj.RESET_ERROR;
+        }
     }
 
 

@@ -92,7 +92,7 @@
             <div class="layui-inline">
                 <label class="layui-form-label">领导部门</label>
                 <div class="layui-input-inline">
-                    <input type="hidden" name="deptid" id="deptid3">
+
                     <ul id="leaderdeptTree" class="dtree" data-id="0"></ul>
                 </div>
             </div>
@@ -100,7 +100,7 @@
                 <label class="layui-form-label">直属领导</label>
                 <div class="layui-input-inline">
                     <select name="mgr" id="mgr" lay-verify="" lay-search>
-                        <option value="">选择直属领导</option>
+
                     </select>
                 </div>
             </div>
@@ -109,13 +109,13 @@
             <div class="layui-inline">
                 <label class="layui-form-label">用户名称</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="name" lay-verify="required"  autocomplete="off" placeholder="请输入用户名称" class="layui-input">
+                    <input type="text" name="name" id="username" lay-verify="required"  autocomplete="off" placeholder="请输入用户名称" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">登录名称</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="loginname" lay-verify="required"  autocomplete="off" placeholder="请输入登录名称" class="layui-input">
+                    <input type="text" name="loginname" id="loginname" lay-verify="required"  autocomplete="off" placeholder="请输入登录名称" class="layui-input">
                 </div>
             </div>
         </div>
@@ -175,7 +175,8 @@
 
         // 初始化添加或修改弹出层中的时间选择器
         laydate.render({
-            elem: '#hiredate'
+            elem: '#hiredate',
+            type:'datetime'
         })
 
         //初始化添加或修改弹出层中的领导部门下拉树
@@ -191,7 +192,16 @@
         });
         //监听领导部门树节点点击事件
         dtree.on("node('leaderdeptTree')" ,function(obj){
-            var mgr = obj.param.nodeId;
+            var deptid = obj.param.nodeId;
+            $.get("/user/loadUsersByDeptId",{deptid:deptid},function (res) {
+                var html = "<option value='0'>选择直属领导</option>";
+                $.each(res.data,function (index, item) {
+                    html+="<option value='"+item.id+"'>"+item.name+"</option>";
+
+                })
+                $("#mgr").html(html);
+                form.render('select');
+            });
         });
 
 
@@ -315,12 +325,34 @@
                     openSelectRoleLayer(data);
                     break;
                 case 'resetPwd':
+                    resetUserPwd(data);
                     break;
                 case 'delete':
                     deleteUser(data);
                     break;
             };
         });
+
+        //重置密码
+        function resetUserPwd(data) {
+            layer.confirm('确定用户=['+data.name+']=的登录密码吗？', {
+                btn: ['确定', '取消'] //可以无限个按钮
+                ,yes: function(index, layero){
+                    $.post("/user/resetUserPwd",{"id":data.id},function (res) {
+                        if (res.code==200){
+                            layer.msg(res.msg);
+                            layer.close(index);
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    });
+                }
+                ,
+                btn2: function(index, layero){
+                    layer.close(index);
+                }
+            });
+        }
 
         //删除用户
         function deleteUser(data) {
@@ -331,6 +363,7 @@
                         if (res.code==200){
                             layer.msg(res.msg);
                             layer.close(index);
+                            tableIns.reload();
                         } else {
                             layer.msg(res.msg);
                         }
@@ -354,6 +387,8 @@
                 success:function(){
                     $("#dataFrm")[0].reset();
                     $("#deptid2").val(null);
+                    $("#mgr").html("<option value='0'>选择直属领导</option>");
+                    form.render('select');
                     url="/user/addUser";
                     //初始化排序码
                     $.get("/user/loadUserMaxOrderNum",function(res){
@@ -385,18 +420,27 @@
 
         //提交添加或修改表单
         form.on("submit(doSubmit)",function (data) {
-            var param = $("#dataFrm").serialize();
-            $.post(url,param,function (res) {
+            $.post(url,data.field,function (res) {
                 if (res.code==200){
+                    tableIns.reload();
                     layer.close(layer.index);
                     layer.msg(res.msg);
                 } else {
                     layer.msg(res.msg);
                 }
-            })
+            });
+            // alert(JSON.stringify(data.field));
 
         })
-        
+
+        //监听添加或修改弹出层中用户名称输入框的失去焦点事件
+        $("#username").on("blur",function () {
+            var username = $(this).val();
+            $.get("/user/ChineseToPinyin",{username:username},function (res) {
+                $("#loginname").val(res.value);
+            });
+        })
+
 
         //打开分配角色弹出层
         function openSelectRoleLayer(data){
@@ -434,7 +478,7 @@
                 success:function(){
                    table.render({
                        elem: '#roleTable'
-                       ,url:'/role/loadAllRole'
+                       ,url:'/user/loadHasRole?id='+data.id
                        ,cols: [ [
                            {type: 'checkbox'}
                            ,{field:'name', title:'角色名称',align:'center'}
