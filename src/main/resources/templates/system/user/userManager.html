@@ -92,6 +92,7 @@
             <div class="layui-inline">
                 <label class="layui-form-label">领导部门</label>
                 <div class="layui-input-inline">
+                    <input type="hidden" name="deptid" id="deptid3">
                     <ul id="leaderdeptTree" class="dtree" data-id="0"></ul>
                 </div>
             </div>
@@ -172,10 +173,27 @@
             var dtree = layui.dtree;
             var url;
 
-        //    初始化添加或修改弹出层中的时间选择器
+        // 初始化添加或修改弹出层中的时间选择器
         laydate.render({
-            elem: '#hiredate' //或 elem: document.getElementById('test')、elem: lay('#test') 等
+            elem: '#hiredate'
         })
+
+        //初始化添加或修改弹出层中的领导部门下拉树
+        dtree.renderSelect({
+            elem: "#leaderdeptTree",
+            width: "100%", // 可以在这里指定树的宽度来填满div
+            dataStyle: "layuiStyle",  //使用layui风格的数据格式
+            dataFormat: "list",  //配置data的风格为list
+            response:{message:"msg",statusCode:0},
+            ficon:["-1"],
+            icon: ["2","8"],//修改response中返回数据的定义
+            url: "/dept/loadDeptManagerLeftTreeJson" // 使用url加载（可与data加载同时存在）
+        });
+        //监听领导部门树节点点击事件
+        dtree.on("node('leaderdeptTree')" ,function(obj){
+            var mgr = obj.param.nodeId;
+        });
+
 
         //初始化搜索条件下拉树
         var selectTree=dtree.renderSelect({
@@ -197,7 +215,7 @@
             $("#deptid1").val(obj.param.nodeId);
         });
 
-        //初始化添加修改的下拉树
+        //初始化添加修改中部门的下拉树
         dtree.renderSelect({
             elem: "#deptTree2",
             width: "100%", // 可以在这里指定树的宽度来填满div
@@ -209,9 +227,8 @@
             url: "/dept/loadDeptManagerLeftTreeJson" // 使用url加载（可与data加载同时存在）
         });
 
-        //监听添加和修改中的下拉树的节点点击事件
+        //监听添加和修改中部门的下拉树的节点点击事件
         dtree.on("node('deptTree2')" ,function(obj){
-            console.log(obj.param); // 点击当前节点传递的参数
             $("#deptid2").val(obj.param.nodeId);
         });
 
@@ -336,6 +353,7 @@
                 title:'添加用户',
                 success:function(){
                     $("#dataFrm")[0].reset();
+                    $("#deptid2").val(null);
                     url="/user/addUser";
                     //初始化排序码
                     $.get("/user/loadUserMaxOrderNum",function(res){

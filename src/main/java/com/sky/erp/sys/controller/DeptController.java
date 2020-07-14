@@ -142,9 +142,9 @@ public class DeptController {
     @RequestMapping("loadDeptMaxOrderNum")
     public Map<String,Object> loadDeptMaxOrderNum(){
         QueryWrapper<Dept> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("max(id) as id");
+        queryWrapper.select("max(ordernum) as ordernum");
         Map<String,Object> map = new HashMap<>();
-        map.put("ordernum",deptService.getOne(queryWrapper).getId()+1);
+        map.put("ordernum",deptService.getOne(queryWrapper).getOrdernum()+1);
         return map;
     }
 

@@ -126,10 +126,10 @@ public class PermissionController {
     @RequestMapping("loadPermissionMaxOrderNum")
     public Map<String,Object> loadPermissionMaxOrderNum(){
         QueryWrapper<Permission> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("max(id) as id");
+        queryWrapper.select("max(ordernum) as ordernum");
         queryWrapper.eq("type",Constant.TYPE_PERMISSION);
         Map<String,Object> map = new HashMap<>();
-        map.put("ordernum",permissionService.getOne(queryWrapper).getId()+1);
+        map.put("ordernum",permissionService.getOne(queryWrapper).getOrdernum()+1);
         return map;
     }
 

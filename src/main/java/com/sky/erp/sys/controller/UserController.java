@@ -8,6 +8,7 @@ import com.sky.erp.sys.common.Constant;
 import com.sky.erp.sys.common.DataGridView;
 import com.sky.erp.sys.common.ResultObj;
 import com.sky.erp.sys.entity.Dept;
+import com.sky.erp.sys.entity.Permission;
 import com.sky.erp.sys.entity.User;
 import com.sky.erp.sys.service.IDeptService;
 import com.sky.erp.sys.service.IUserService;
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -95,6 +98,18 @@ public class UserController {
         } catch (Exception e){
             return ResultObj.DELETE_ERROR;
         }
+    }
+
+    /**
+     * 获取排序码
+     */
+    @RequestMapping("loadUserMaxOrderNum")
+    public Map<String,Object> loadUserMaxOrderNum(){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("max(ordernum) as ordernum");
+        Map<String,Object> map = new HashMap<>();
+        map.put("ordernum",userService.getOne(queryWrapper).getOrdernum()+1);
+        return map;
     }
 
 

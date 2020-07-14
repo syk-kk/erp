@@ -163,10 +163,10 @@ public class MenuController {
     @RequestMapping("loadMenuMaxOrderNum")
     public Map<String,Object> loadMenuMaxOrderNum(){
         QueryWrapper<Permission> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("max(id) as id");
+        queryWrapper.select("max(ordernum) as ordernum");
         queryWrapper.eq("type",Constant.TYPE_MENU);
         Map<String,Object> map = new HashMap<>();
-        map.put("ordernum",permissionService.getOne(queryWrapper).getId()+1);
+        map.put("ordernum",permissionService.getOne(queryWrapper).getOrdernum()+1);
         return map;
     }
 }
