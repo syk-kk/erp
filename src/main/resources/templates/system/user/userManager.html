@@ -73,45 +73,79 @@
 <div style="display: none;padding: 5px" id="addOrUpdateDiv">
     <form action="" method="post" class="layui-form layui-form-pane" id="dataFrm" lay-filter="dataFrm">
         <div class="layui-form-item">
-            <label class="layui-form-label">父级部门</label>
-            <div class="layui-input-block">
-                <input type="hidden" name="deptid" id="deptid2">
-                <ul id="deptTree2" class="dtree" data-id="0"></ul>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">部门名称</label>
-            <div class="layui-input-block">
-                <input type="hidden" name="id">
-                <input type="text" name="title" lay-verify="required" autocomplete="off" placeholder="请输入部门名称" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">部门地址</label>
-            <div class="layui-input-block">
-                <input type="text" name="address" lay-verify="required" autocomplete="off" placeholder="请输入部门地址" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">部门备注</label>
-            <div class="layui-input-block">
-                <textarea class="layui-textarea" name="remark"></textarea>
-            </div>
-        </div>
-        <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">是否展开</label>
-                <input type="checkbox" id="open" name="open" lay-skin="switch" lay-text="展开|不展开" value="1">
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">是否可用</label>
-                <input type="checkbox" id="available" name="available" lay-skin="switch" lay-filter="isAvailable" lay-text="可用|不可用" value="1">
+                <label class="layui-form-label">所属部门</label>
+                <div class="layui-input-inline">
+                    <input type="hidden" name="id">
+                    <input type="hidden" name="deptid" id="deptid2">
+                    <ul id="deptTree2" class="dtree" data-id="0"></ul>
+                </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">排序码</label>
                 <div class="layui-input-inline">
                     <input type="text" name="ordernum" id="ordernum" lay-verify="required|number"  autocomplete="off" placeholder="请输入排序码[>0]" class="layui-input">
                 </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">领导部门</label>
+                <div class="layui-input-inline">
+                    <ul id="leaderdeptTree" class="dtree" data-id="0"></ul>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">直属领导</label>
+                <div class="layui-input-inline">
+                    <select name="mgr" id="mgr" lay-verify="" lay-search>
+                        <option value="">选择直属领导</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" lay-verify="required"  autocomplete="off" placeholder="请输入用户名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">登录名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="loginname" lay-verify="required"  autocomplete="off" placeholder="请输入登录名称" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" lay-verify="required"  autocomplete="off" placeholder="请输入用户地址" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户备注</label>
+            <div class="layui-input-block">
+                <textarea name="remark" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">性别</label>
+                <input type="radio" name="sex" value="1" title="男" >
+                <input type="radio" name="sex" value="0" title="女">
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">是否可用</label>
+                <input type="checkbox" id="available" name="available" lay-skin="switch" lay-filter="isAvailable" lay-text="可用|不可用" value="1">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">入职时间</label>
+            <div class="layui-input-block">
+                <input type="text" id="hiredate" name="hiredate" lay-verify="required"  autocomplete="off" placeholder="请选择入职时间" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -137,6 +171,11 @@
             var laydate = layui.laydate;
             var dtree = layui.dtree;
             var url;
+
+        //    初始化添加或修改弹出层中的时间选择器
+        laydate.render({
+            elem: '#hiredate' //或 elem: document.getElementById('test')、elem: lay('#test') 等
+        })
 
         //初始化搜索条件下拉树
         var selectTree=dtree.renderSelect({
