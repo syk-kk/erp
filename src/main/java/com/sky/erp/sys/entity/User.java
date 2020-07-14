@@ -75,7 +75,10 @@ public class User implements Serializable {
     private String leadername;//直属领导名称
 
     @TableField(exist = false)
-    private String deptname;//部门名称
+    private Integer leaderdeptid;
+
+    @TableField(exist = false)
+    private String deptname;//所属部门名称
 
 
 }

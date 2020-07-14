@@ -193,16 +193,32 @@
         //监听领导部门树节点点击事件
         dtree.on("node('leaderdeptTree')" ,function(obj){
             var deptid = obj.param.nodeId;
+            getLeader(deptid,null);
+        });
+
+        //领导部门树节点点击事件执行函数
+        function getLeader(deptid,leadername) {
             $.get("/user/loadUsersByDeptId",{deptid:deptid},function (res) {
                 var html = "<option value='0'>选择直属领导</option>";
-                $.each(res.data,function (index, item) {
-                    html+="<option value='"+item.id+"'>"+item.name+"</option>";
+                if (leadername==null){
+                    $.each(res.data,function (index, item) {
+                        html+="<option value='"+item.id+"'>"+item.name+"</option>";
 
-                })
+                    })
+                } else {
+                    $.each(res.data,function (index, item) {
+                        if (item.name==leadername){
+                            html+="<option value='"+item.id+"' selected >"+item.name+"</option>";
+                        } else {
+                            html+="<option value='"+item.id+"'>"+item.name+"</option>";
+                        }
+                    })
+                }
+
                 $("#mgr").html(html);
                 form.render('select');
             });
-        });
+        }
 
 
         //初始化搜索条件下拉树
@@ -409,9 +425,15 @@
                     $("#dataFrm")[0].reset();
                     // 装载新的数据
                     form.val("dataFrm",data);
-                    // 显示父级部门
+                    // 显示所属部门
                     dtree.dataInit("deptTree2", data.deptid);
                     dtree.selectVal("deptTree2");
+                    //显示直属领导部门
+                    dtree.dataInit("leaderdeptTree", data.leaderdeptid);
+                    dtree.selectVal("leaderdeptTree");
+                    //显示当前直属领导部门中的所有领导
+                    getLeader(data.leaderdeptid,data.leadername);
+
                     url="/user/updateUser";
                 }
             });

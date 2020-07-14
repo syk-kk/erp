@@ -76,7 +76,9 @@ public class UserController {
             }
             Integer mgr = user.getMgr();
             if (mgr!=null){
-                user.setLeadername(userService.getById(mgr).getName());
+                User leader = userService.getById(mgr);
+                user.setLeadername(leader.getName());
+                user.setLeaderdeptid(leader.getDeptid());
             }
         }
 
@@ -220,6 +222,16 @@ public class UserController {
             return ResultObj.RESET_SUCCESS;
         } catch (Exception e){
             return ResultObj.RESET_ERROR;
+        }
+    }
+
+    @RequestMapping("updateUser")
+    public ResultObj updateUser(User user){
+        try {
+            userService.updateById(user);
+            return ResultObj.UPDATE_SUCCESS;
+        } catch (Exception e){
+            return ResultObj.UPDATE_ERROR;
         }
     }
 
