@@ -1,0 +1,55 @@
+server:
+  port: 8080
+spring:
+  thymeleaf:
+    cache: false
+    enabled: true
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:3306/erp?autoReconnect=true&useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: test
+      password: 123456789
+      filter: stat,wall,log4j
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: .js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: admin
+      validation-query: select 1
+  #对日期格式化
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+#配置mybatisplus
+mybatis-plus:
+  mapper-locations:
+    - classpath:mapper/*/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+#配置shiro
+shiro:
+  loginUrl: /index.html
+
+#用于动态的对shiro配置，和@ConfigurationProperties(prefix = "shiropropertity")对应
+shiropropertity:
+  hash-algorithm-name: md5
+  hash-iterations: 2
+  anon-urls:
+    - /sys/toLogin
+    - /login/login
+    - /login/getCode
+    - /resources/**
+  authc-ulrs:
+    - /**
+
+
