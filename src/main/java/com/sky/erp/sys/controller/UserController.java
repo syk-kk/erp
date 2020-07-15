@@ -107,7 +107,6 @@ public class UserController {
      */
     @RequestMapping("loadHasRole")
     public DataGridView loadHasRole(Integer id){
-        List<Role> data = new ArrayList<>();
         QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("available",Constant.AVAILABLE_TRUE);
         List<Role> allRole = roleService.list(queryWrapper);
@@ -121,9 +120,8 @@ public class UserController {
                 }
             }
             role.setLAY_CHECKED(flag);
-            data.add(role);
         }
-        return new DataGridView(data);
+        return new DataGridView(allRole);
 
     }
 
