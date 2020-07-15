@@ -13,6 +13,7 @@ import com.sky.erp.sys.service.IRoleService;
 import com.sky.erp.sys.service.IUserService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
@@ -37,7 +38,27 @@ public class UserRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        return null;
+
+        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+
+        ActiveUser activeUser = (ActiveUser)principalCollection.getPrimaryPrincipal();
+        User user = activeUser.getUser();
+
+        if (user.getType().equals(Constant.USER_TYPE_SUPPER)){
+            authorizationInfo.addStringPermission("*:*");
+        } else {
+            List<String> percode = new ArrayList<>();
+            for (Permission permission : activeUser.getPermissions()) {
+                if (permission.getType().equals(Constant.TYPE_PERMISSION)){
+                    percode.add(permission.getPercode());
+                }
+            }
+            System.out.println(percode.toString());
+            authorizationInfo.addStringPermissions(percode);
+        }
+
+
+        return authorizationInfo;
     }
 
     /*
