@@ -26,26 +26,22 @@ public class MenuController {
     private IPermissionService permissionService;
 
     @RequestMapping("loadIndexLeftMenuJson")
-    public DataGridView loadIndexLeftMenuJson(HttpSession session){
-        //构造查询条件
-        QueryWrapper<Permission> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("type", Constant.TYPE_MENU);
-        queryWrapper.eq("available",Constant.AVAILABLE_TRUE);
+    public DataGridView loadIndexLeftMenuJson(){
 
-        //用户对应的菜单集合
-        List<Permission> menu = null;
         //节点集合
         List<TreeNode> list = new ArrayList<>();
 
         //获得登录用户，取出用户中的菜单权限
         ActiveUser activeUser = (ActiveUser) SecurityUtils.getSubject().getPrincipal();
-        menu = activeUser.getPermissions();
+        List<Permission> menu = activeUser.getPermissions();
 
         for (Permission permission : menu) {
-            TreeNode node = new TreeNode(permission.getId(),permission.getPid(),
-                    permission.getTitle(),permission.getIcon(),permission.getHref(),
-                    permission.getOpen()==1?true:false);
-            list.add(node);
+            if (permission.getType().equals(Constant.TYPE_MENU)){
+                TreeNode node = new TreeNode(permission.getId(),permission.getPid(),
+                        permission.getTitle(),permission.getIcon(),permission.getHref(),
+                        permission.getOpen()==1?true:false);
+                list.add(node);
+            }
         }
         List<TreeNode> nodes = TreeNodeBuilder.builder(list, 1);
 
