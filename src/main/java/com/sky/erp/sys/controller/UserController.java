@@ -216,15 +216,22 @@ public class UserController {
     @RequestMapping("resetUserPwd")
     public ResultObj resetUserPwd(Integer id){
         try {
-            User user = userService.getById(id);
-            user.setPwd(new Md5Hash(Constant.USER_DEFAULT_PWD,user.getSalt(),2).toString());
-            userService.updateById(user);
+            User user = new User();
+            String salt = IdUtil.simpleUUID().toUpperCase();
+            user.setId(id);
+            user.setSalt(salt);
+            user.setPwd(new Md5Hash(Constant.USER_DEFAULT_PWD,salt,2).toString());
             return ResultObj.RESET_SUCCESS;
         } catch (Exception e){
             return ResultObj.RESET_ERROR;
         }
     }
 
+    /**
+     * 更新用户
+     * @param user
+     * @return
+     */
     @RequestMapping("updateUser")
     public ResultObj updateUser(User user){
         try {
