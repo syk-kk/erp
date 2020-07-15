@@ -221,6 +221,7 @@ public class UserController {
             user.setId(id);
             user.setSalt(salt);
             user.setPwd(new Md5Hash(Constant.USER_DEFAULT_PWD,salt,2).toString());
+            userService.updateById(user);
             return ResultObj.RESET_SUCCESS;
         } catch (Exception e){
             return ResultObj.RESET_ERROR;

@@ -351,7 +351,7 @@
 
         //重置密码
         function resetUserPwd(data) {
-            layer.confirm('确定用户=['+data.name+']=的登录密码吗？', {
+            layer.confirm('确定重置用户=['+data.name+']=的登录密码吗？', {
                 btn: ['确定', '取消'] //可以无限个按钮
                 ,yes: function(index, layero){
                     $.post("/user/resetUserPwd",{"id":data.id},function (res) {
