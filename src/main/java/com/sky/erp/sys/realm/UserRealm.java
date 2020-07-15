@@ -62,19 +62,17 @@ public class UserRealm extends AuthorizingRealm {
             ActiveUser activeUser = new ActiveUser();
             activeUser.setUser(user);
 
-            if (user.getType()==Constant.USER_TYPE_NORMAL){
-                //根据用户id查询拥有的角色id,并把拥有的角色放到activeUser中
-                List<Integer> rids = userService.getHasRoleIdsByUid(user.getId());
-                roleQueryWrapper.eq("available",Constant.AVAILABLE_TRUE);
-                roleQueryWrapper.in("id",rids);
-                activeUser.setRoles(roleService.list(roleQueryWrapper));
+            //根据用户id查询拥有的角色id,并把拥有的角色放到activeUser中
+            List<Integer> rids = userService.getHasRoleIdsByUid(user.getId());
+            roleQueryWrapper.eq("available",Constant.AVAILABLE_TRUE);
+            roleQueryWrapper.in("id",rids);
+            activeUser.setRoles(roleService.list(roleQueryWrapper));
 
-                //根据角色id查询对于的权限，并放到activeUser中
-                permissionQueryWrapper.eq("available",Constant.AVAILABLE_TRUE);
-                for (Integer rid : rids) {
-                    permissionQueryWrapper.in("id",roleService.queryRolePermissionIdsByRid(rid));
-                    activeUser.setPermissions((ArrayList)CollUtil.addAll(activeUser.getPermissions(),permissionService.list(permissionQueryWrapper)));
-                }
+            //根据角色id查询对于的权限，并放到activeUser中
+            permissionQueryWrapper.eq("available",Constant.AVAILABLE_TRUE);
+            for (Integer rid : rids) {
+                permissionQueryWrapper.in("id",roleService.queryRolePermissionIdsByRid(rid));
+                activeUser.setPermissions((ArrayList)CollUtil.addAll(activeUser.getPermissions(),permissionService.list(permissionQueryWrapper)));
             }
 
 

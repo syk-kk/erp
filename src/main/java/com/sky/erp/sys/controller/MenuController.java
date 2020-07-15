@@ -36,18 +36,10 @@ public class MenuController {
         List<Permission> menu = null;
         //节点集合
         List<TreeNode> list = new ArrayList<>();
-        //获得登录用户
-        User user = (User) session.getAttribute("user");
-        //判断登录用户类型
-        if (user.getType() == Constant.USER_TYPE_SUPPER){
-            //是超级管理员，查询所有可用的菜单
-            menu = permissionService.list(queryWrapper);
-        }else {
-            //是普通用户，根据用户的id查询角色，根据角色id查询对应的菜单
-//            menu = permissionService.list(queryWrapper);
-            ActiveUser activeUser = (ActiveUser) SecurityUtils.getSubject().getPrincipal();
-            menu = activeUser.getPermissions();
-        }
+
+        //获得登录用户，取出用户中的菜单权限
+        ActiveUser activeUser = (ActiveUser) SecurityUtils.getSubject().getPrincipal();
+        menu = activeUser.getPermissions();
 
         for (Permission permission : menu) {
             TreeNode node = new TreeNode(permission.getId(),permission.getPid(),
