@@ -69,11 +69,10 @@ public class UserRealm extends AuthorizingRealm {
             activeUser.setRoles(roleService.list(roleQueryWrapper));
 
             //根据角色id查询对于的权限，并放到activeUser中
+            List<Integer> pids = permissionService.getRolePermissionPidsByRids(rids);
             permissionQueryWrapper.eq("available",Constant.AVAILABLE_TRUE);
-            for (Integer rid : rids) {
-                permissionQueryWrapper.in("id",roleService.queryRolePermissionIdsByRid(rid));
-                activeUser.setPermissions((ArrayList)CollUtil.addAll(activeUser.getPermissions(),permissionService.list(permissionQueryWrapper)));
-            }
+            permissionQueryWrapper.in("id",pids);
+            activeUser.setPermissions(permissionService.list(permissionQueryWrapper));
 
 
             SimpleAuthenticationInfo authenticationInfo =

@@ -6,4 +6,12 @@
         delete from sys_role_permission where pid=#{id}
 
     </delete>
+
+    <select id="getRolePermissionPidsByRids" parameterType="list" resultType="integer">
+        select distinct pid from sys_role_permission
+        where rid in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * <p>
@@ -18,4 +19,5 @@ public interface PermissionMapper extends BaseMapper<Permission> {
 
     //根据id删除角色和权限关系表中的对应记录
     void removeRolePermissionById(@Param("id") Serializable id);
+    List<Integer> getRolePermissionPidsByRids(List<Integer> rids);
 }

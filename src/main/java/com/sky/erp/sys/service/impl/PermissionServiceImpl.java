@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * <p>
@@ -34,5 +35,10 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
             getBaseMapper().removeRolePermissionById(id);
         }
         return super.removeByIds(idList);
+    }
+
+    @Override
+    public List<Integer> getRolePermissionPidsByRids(List<Integer> rids) {
+        return getBaseMapper().getRolePermissionPidsByRids(rids);
     }
 }
