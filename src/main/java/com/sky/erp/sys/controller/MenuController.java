@@ -10,6 +10,7 @@ import com.sky.erp.sys.entity.User;
 import com.sky.erp.sys.service.IPermissionService;
 import com.sky.erp.sys.vo.DeptVo;
 import com.sky.erp.sys.vo.PermissionVo;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +44,9 @@ public class MenuController {
             menu = permissionService.list(queryWrapper);
         }else {
             //是普通用户，根据用户的id查询角色，根据角色id查询对应的菜单
-            menu = permissionService.list(queryWrapper);
+//            menu = permissionService.list(queryWrapper);
+            ActiveUser activeUser = (ActiveUser) SecurityUtils.getSubject().getPrincipal();
+            menu = activeUser.getPermissions();
         }
 
         for (Permission permission : menu) {
