@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>公告管理</title>
+    <title>客户管理</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
@@ -23,27 +23,21 @@
     <form action="" method="post" id="searchFrm" lay-filter="searchFrm" class="layui-form layui-form-pane">
         <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">公告标题</label>
+                <label class="layui-form-label">客户名称</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="title"  autocomplete="off" class="layui-input">
+                    <input type="text" name="customername"  autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
-                <label class="layui-form-label">公告内容</label>
+                <label class="layui-form-label">开户行</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="content"    autocomplete="off" class="layui-input">
+                    <input type="text" name="bank" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
-                <label class="layui-form-label">最早时间</label>
+                <label class="layui-form-label">联系人</label>
                 <div class="layui-input-inline">
-                    <input type="tel" name="startTime" id="startTime" readonly="readonly" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">结束时间</label>
-                <div class="layui-input-inline">
-                    <input type="tel" name="endTime"  id="endTime"  readonly="readonly"  class="layui-input">
+                    <input type="text" name="connectionperson" class="layui-input">
                 </div>
             </div>
         </div>
@@ -59,108 +53,151 @@
 <!-- 搜索条件结束 -->
 
 <!-- 数据表格开始 -->
-<table class="layui-hide" id="noticeTable" lay-filter="noticeTable"></table>
-<div style="display: none;" id="noticeToolBar">
+<table class="layui-hide" id="customerTable" lay-filter="customerTable"></table>
+<div style="display: none;" id="customerToolBar">
     <button type="button" class="layui-btn layui-btn-sm" lay-event="add"><i class="iconfont icon-tianjiazengjiajia">添加</i></button>
     <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" lay-event="deleteBatch"><i class="iconfont icon-shanchu">批量删除</i></button>
 </div>
-<div  id="noticeBar" style="display: none;">
+<div  id="customerBar" style="display: none;">
     <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="iconfont icon-xiugai">编辑</i></a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="iconfont icon-icon_huabanfuben">删除</i></a>
-    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="viewNotice"><i class="iconfont icon-chakan">查看</i></a>
 </div>
 <!-- 数据表格结束 -->
 
 <!-- 添加和修改的弹出层开始 -->
-<div style="display: none;padding: 10px" id="saveOrUpdateDiv" >
-    <form class="layui-form"  lay-filter="dataFrm" id="dataFrm">
+<div style="display: none;padding: 5px" id="addOrUpdateDiv">
+    <form action="" method="post" class="layui-form layui-form-pane" id="dataFrm" lay-filter="dataFrm">
         <div class="layui-form-item">
-            <label class="layui-form-label">公告标题:</label>
             <div class="layui-input-block">
-                <input type="hidden" name="id">
-                <input type="hidden" name="opername">
-                <input type="text" name="title"  placeholder="请输入公告标题" autocomplete="off"
-                       class="layui-input" lay-verify="required">
+                <label class="layui-form-label">客户名称</label>
+                <div class="layui-input-block">
+                    <input type="hidden" name="id">
+                    <input type="text" name="customername" lay-verify="required" placeholder="请输入客户名称" class="layui-text">
+                </div>
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">公告内容:</label>
             <div class="layui-input-block">
-                <textarea class="layui-textarea layui-hide" name="content"  id="content"></textarea>
+                <label class="layui-form-label">公司地址</label>
+                <div class="layui-input-block">
+                    <input type="text" name="address" lay-verify="required" autocomplete="off" placeholder="请输入公司地址" class="layui-input">
+                </div>
             </div>
         </div>
-        <div class="layui-form-item" style="text-align: center;">
-            <div class="layui-input-block">
-                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-filter="doSubmit" lay-submit=""><i class="iconfont icon-tijiao">提交</i></button>
-                <button type="reset" id="dataFrmResetBtn" class="layui-btn layui-btn-warm layui-btn-sm" ><i class="iconfont icon-zhongzhi">重置</i></button>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">电话</label>
+                <div class="layui-input-block">
+                    <input type="text" name="telephone" class="layui-text" placeholder="请输入电话" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">邮编</label>
+                <div class="layui-input-block">
+                    <input type="text" name="zip" lay-verify="required" autocomplete="off" placeholder="请输入邮编" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">传真</label>
+                <div class="layui-input-block">
+                    <input type="text" name="fax" lay-verify="required" autocomplete="off" placeholder="请输入传真" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">联系人</label>
+                <div class="layui-input-block">
+                    <input type="text" name="connectionperson" class="layui-text" placeholder="请输入联系人" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">联系人电话</label>
+                <div class="layui-input-block">
+                    <input type="text" name="phone" class="layui-text" placeholder="请输入联系人电话" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">联系人邮箱</label>
+                <div class="layui-input-block">
+                    <input type="text" name="email" class="layui-text" placeholder="请输入联系人邮箱" lay-verify="required">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">开户行</label>
+                <div class="layui-input-block">
+                    <input type="text" name="bank" lay-verify="required" autocomplete="off" placeholder="请输入开户行" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">开户行账号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="account" lay-verify="required" autocomplete="off" placeholder="请输入开户行账号" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">合作状态</label>
+                <input type="checkbox" id="available" name="available" lay-skin="switch" lay-text="进行中|已终止" value="1">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center;">
+                <button type="button" class="layui-btn" lay-submit="" id="doSubmit" lay-filter="doSubmit" ><i class="iconfont icon-tijiao">提交</i></button>
+                <button type="reset" class="layui-btn layui-btn-warm"><i class="iconfont icon-zhongzhi">重置</i></button>
             </div>
         </div>
     </form>
-
 </div>
 <!-- 添加和修改的弹出层结束 -->
 
 
-<!-- 查看公告的div -->
-<div id="viewNoticeDiv" style="padding: 10px;display: none;overflow: auto;">
-    <h2 id="view_title" align="center"></h2>
-    <hr>
-    <div style="text-align: center;">
-        发布人:<span id="view_opername"></span>  <span style="display: inline-block;width: 20px" ></span>
-        发布时间:<span id="view_createtime"></span>
-    </div>
-    <hr>
-    <div id="view_content"></div>
-</div>
-
 <script src="/resources/layui/layui.js"></script>
 <script type="text/javascript">
     var tableIns;
-    layui.use([ 'jquery', 'layer', 'form', 'table','laydate','layedit' ], function() {
+    layui.use([ 'jquery', 'layer', 'form', 'table','layedit' ], function() {
         var $ = layui.jquery;
         var layer = layui.layer;
         var form = layui.form;
         var table = layui.table;
-        var laydate=layui.laydate;
         var layedit=layui.layedit;
         var url;
 
-        //渲染时间
-        laydate.render({
-            elem:'#startTime',
-            type:'datetime'
-        });
-        laydate.render({
-            elem:'#endTime',
-            type:'datetime'
-        });
-        //初始化富文本编辑器
-        var editIndex;
 
         //渲染数据表格
         tableIns=table.render({
-            elem: '#noticeTable'   //渲染的目标对象
-            ,url:'/notice/loadAllNotice' //数据接口
+            elem: '#customerTable'   //渲染的目标对象
+            ,url:'/customer/loadAllCustomer' //数据接口
             ,title: '公告信息'//数据导出来的标题
-            ,toolbar:"#noticeToolBar"   //表格的工具条
+            ,toolbar:"#customerToolBar"   //表格的工具条
             ,height:'full-175'
             ,cellMinWidth:100 //设置列的最小默认宽度
             ,page: true  //是否启用分页
             ,cols: [ [   //列表数据
                 {type: 'checkbox', fixed: 'left'}
-                ,{field:'id', title:'ID',align:'center'}
-                ,{field:'title', title:'公告标题',align:'center'}
-                /* ,{field:'content', title:'公告内容',align:'center'} */
-                ,{field:'createtime', title:'发布时间',align:'center',sort:true}
-                ,{field:'opername', title:'发布人',align:'center'}
-                ,{fixed: 'right', title:'操作', toolbar: '#noticeBar', width:260,align:'center'}
+                ,{field:'id',fixed: 'left', title:'ID',align:'center',width:100}
+                ,{field:'customername', title:'客户名称',align:'center',width:160}
+                ,{field:'address', title:'公司地址',align:'center',width:260}
+                ,{field:'telephone', title:'电话',align:'center',width:160}
+                ,{field:'zip', title:'邮编',align:'center',width:160}
+                ,{field:'fax', title:'传真',align:'center',width:160}
+                ,{field:'connectionperson', title:'联系人',align:'center',width:160}
+                ,{field:'phone', title:'联系人电话',align:'center',width:160}
+                ,{field:'email', title:'联系人邮箱',align:'center',width:160}
+                ,{field:'bank', title:'开户行',align:'center',width:160}
+                ,{field:'account', title:'开户行账号',align:'center',width:300}
+                ,{field:'available', title:'合作状态',align:'center',width:'160',templet:function (d) {
+                        return d.available==1?'<font color="green">进行中</font>':'<font color="red">已终止</font>'
+                    }}
+                ,{fixed: 'right', title:'操作', toolbar: '#customerBar', width:150,align:'center'}
             ] ]
         })
         //模糊查询
         $("#doSearch").click(function(){
             var params=$("#searchFrm").serialize();
             tableIns.reload({
-                url:"/notice/loadAllNotice?"+params,
+                url:"/customer/loadAllCustomer?"+params,
                 page:{curr:1}
 
             });
@@ -197,8 +234,6 @@
                 });
             } else if(layEvent === 'edit'){ //编辑
                 openUpdateNotice(data);
-            }else if(layEvent==='viewNotice'){
-                viewNotice(data);
             }
         });
 
@@ -221,10 +256,6 @@
             });
         }
 
-        //清空富文本编辑框中的内容
-        $("#dataFrmResetBtn").click(function(){
-            layedit.setContent(editIndex,"");
-        });
 
         //打开修改页面
         function openUpdateNotice(data){
@@ -269,22 +300,6 @@
             */
         });
 
-
-        //查看
-        function viewNotice(data){
-            mainIndex=layer.open({
-                type:1,
-                title:'公告查看',
-                content:$("#viewNoticeDiv"),
-                area:['600px','450px'],
-                success:function(index){
-                    $("#view_title").html(data.title);
-                    $("#view_opername").html(data.opername);
-                    $("#view_createtime").html(data.createtime);
-                    $("#view_content").html(data.content);
-                }
-            });
-        }
 
         //批量删除
         function deleteBatch(){

@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 
-@MapperScan(basePackages = {"com.sky.erp.sys.mapper"})
+@MapperScan(basePackages = {"com.sky.erp.sys.mapper","com.sky.erp.bus.mapper"})
 public class ErpApplication {
 
     public static void main(String[] args) {
