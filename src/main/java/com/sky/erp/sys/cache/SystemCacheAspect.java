@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Aspect
 @Component
-public class CacheAspect {
+public class SystemCacheAspect {
 
     private Log log = LogFactory.get();
     /**
