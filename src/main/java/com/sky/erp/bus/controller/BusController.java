@@ -22,4 +22,12 @@ public class BusController {
     public String toProviderManager(){
         return "business/provider/providerManager";
     }
+
+    /**
+     * 跳转到商品管理页面
+     */
+    @RequestMapping("toGoodsManager")
+    public String toGoodsManager(){
+        return "business/goods/goodsManager";
+    }
 }
