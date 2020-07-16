@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>客户管理</title>
+    <title>供应商管理</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
@@ -23,9 +23,9 @@
     <form action="" method="post" id="searchFrm" lay-filter="searchFrm" class="layui-form layui-form-pane">
         <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">客户名称</label>
+                <label class="layui-form-label">供应商名称</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="customername"  autocomplete="off" class="layui-input">
+                    <input type="text" name="providername"  autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
@@ -53,12 +53,12 @@
 <!-- 搜索条件结束 -->
 
 <!-- 数据表格开始 -->
-<table class="layui-hide" id="customerTable" lay-filter="customerTable"></table>
-<div style="display: none;" id="customerToolBar">
-    <button type="button" class="layui-btn layui-btn-sm" lay-event="add"><i class="iconfont icon-tianjiazengjiajia">添加客户</i></button>
+<table class="layui-hide" id="providerTable" lay-filter="providerTable"></table>
+<div style="display: none;" id="providerToolBar">
+    <button type="button" class="layui-btn layui-btn-sm" lay-event="add"><i class="iconfont icon-tianjiazengjiajia">添加供应商</i></button>
     <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" lay-event="deleteBatch"><i class="iconfont icon-shanchu">批量删除</i></button>
 </div>
-<div  id="customerBar" style="display: none;">
+<div  id="providerBar" style="display: none;">
     <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="iconfont icon-xiugai">编辑</i></a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="iconfont icon-icon_huabanfuben">删除</i></a>
 </div>
@@ -68,10 +68,10 @@
 <div style="display: none;padding: 5px" id="addOrUpdateDiv">
     <form action="" method="post" class="layui-form layui-form-pane" id="dataFrm" lay-filter="dataFrm">
         <div class="layui-form-item">
-            <label class="layui-form-label">客户名称</label>
+            <label class="layui-form-label">供应商名称</label>
             <input type="hidden" name="id">
             <div class="layui-input-block">
-                <input type="text" name="customername" lay-verify="required" autocomplete="off" placeholder="请输入客户名称" class="layui-input">
+                <input type="text" name="providername" lay-verify="required" autocomplete="off" placeholder="请输入供应商名称" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -165,17 +165,17 @@
 
         //渲染数据表格
         tableIns=table.render({
-            elem: '#customerTable'   //渲染的目标对象
-            ,url:'/customer/loadAllCustomer' //数据接口
-            ,title: '公告信息'//数据导出来的标题
-            ,toolbar:"#customerToolBar"   //表格的工具条
+            elem: '#providerTable'   //渲染的目标对象
+            ,url:'/provider/loadAllProvider' //数据接口
+            ,title: '供应航数据表'//数据导出来的标题
+            ,toolbar:"#providerToolBar"   //表格的工具条
             ,height:'full-175'
             ,cellMinWidth:100 //设置列的最小默认宽度
             ,page: true  //是否启用分页
             ,cols: [ [   //列表数据
                 {type: 'checkbox', fixed: 'left'}
                 ,{field:'id',fixed: 'left', title:'ID',align:'center',width:100}
-                ,{field:'customername', title:'客户名称',align:'center',width:160}
+                ,{field:'providername', title:'供应商名称',align:'center',width:160}
                 ,{field:'address', title:'公司地址',align:'center',width:260}
                 ,{field:'telephone', title:'电话',align:'center',width:160}
                 ,{field:'zip', title:'邮编',align:'center',width:160}
@@ -188,14 +188,14 @@
                 ,{field:'available', title:'合作状态',align:'center',width:'160',templet:function (d) {
                         return d.available==1?'<font color="green">进行中</font>':'<font color="red">已终止</font>'
                     }}
-                ,{fixed: 'right', title:'操作', toolbar: '#customerBar', width:150,align:'center'}
+                ,{fixed: 'right', title:'操作', toolbar: '#providerBar', width:150,align:'center'}
             ] ]
         })
         //模糊查询
         $("#doSearch").click(function(){
             var params=$("#searchFrm").serialize();
             tableIns.reload({
-                url:"/customer/loadAllCustomer?"+params,
+                url:"/provider/loadAllProvider?"+params,
                 page:{curr:1}
 
             });
@@ -203,10 +203,10 @@
         });
 
         //监听头部工具栏事件
-        table.on("toolbar(customerTable)",function(obj){
+        table.on("toolbar(providerTable)",function(obj){
             switch(obj.event){
                 case 'add':
-                    openAddCustomer();
+                    openAddProvider();
                     break;
                 case 'deleteBatch':
                     deleteBatch();
@@ -214,13 +214,13 @@
             };
         })
         //监听行工具事件
-        table.on('tool(customerTable)', function(obj){
+        table.on('tool(providerTable)', function(obj){
             var data = obj.data; //获得当前行数据
             var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
             if(layEvent === 'del'){ //删除
-                layer.confirm('确定删除客户=['+data.customername+']=吗？', function(index){
+                layer.confirm('确定删除供应商=['+data.providername+']=吗？', function(index){
                     //向服务端发送删除指令
-                    $.post("/customer/deleteCustomer",{id:data.id},function(res){
+                    $.post("/provider/deleteProvider",{id:data.id},function(res){
                         if (res.code!=200){
                             layer.msg(res.msg);
                         } else {
@@ -231,20 +231,20 @@
                     })
                 });
             } else if(layEvent === 'edit'){ //编辑
-                openUpdateCustomer(data);
+                openUpdateProvider(data);
             }
         });
 
 
         //打开添加页面
-        function openAddCustomer(){
+        function openAddProvider(){
             layer.open({
                 type:1,
-                title:'客户添加',
+                title:'供应商添加',
                 content:$("#addOrUpdateDiv"),
                 area:['1000px'],
                 success:function(index){
-                    url="/customer/addCustomer";
+                    url="/provider/addProvider";
                     //清空表单数据
                     $("#dataFrm")[0].reset();
                     //建立编辑器
@@ -256,14 +256,14 @@
 
 
         //打开修改页面
-        function openUpdateCustomer(data){
+        function openUpdateProvider(data){
             layer.open({
                 type:1,
-                title:'客户修改',
+                title:'供应商修改',
                 content:$("#addOrUpdateDiv"),
                 area:['1000px'],
                 success:function(index){
-                    url="/customer/updateCustomer";
+                    url="/provider/updateProvider";
                     form.val("dataFrm",data);
                 }
             });
@@ -290,7 +290,7 @@
         //批量删除
         function deleteBatch(){
             //得到选中的数据行
-            var checkStatus = table.checkStatus('customerTable');
+            var checkStatus = table.checkStatus('providerTable');
             var data = checkStatus.data;
             var params="";
             if (data.length>0){
@@ -301,9 +301,9 @@
                         params+="&ids="+item.id;
                     }
                 });
-                layer.confirm('确定删除选中的客户吗？', function(index){
+                layer.confirm('确定删除选中的供应商吗？', function(index){
                     //向服务端发送删除指令
-                    $.post("/customer/deleteBatchCustomer",params,function(res){
+                    $.post("/provider/deleteBatchProvider",params,function(res){
                         if (res.code!=200){
                             layer.msg(res.msg);
                         } else {

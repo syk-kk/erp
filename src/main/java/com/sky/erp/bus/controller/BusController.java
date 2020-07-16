@@ -14,4 +14,12 @@ public class BusController {
     public String toCustomerManager(){
         return "business/customer/customerManager";
     }
+
+    /**
+     * 跳转到供应商管理页面
+     */
+    @RequestMapping("toProviderManager")
+    public String toProviderManager(){
+        return "business/provider/providerManager";
+    }
 }
