@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sky.erp.bus.entity.Provider;
 import com.sky.erp.bus.service.IProviderService;
 import com.sky.erp.bus.vo.ProviderVo;
+import com.sky.erp.sys.common.Constant;
 import com.sky.erp.sys.common.DataGridView;
 import com.sky.erp.sys.common.ResultObj;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>
@@ -102,6 +104,17 @@ public class ProviderController {
             return ResultObj.DELETE_ERROR;
         }
     }
-    
-    
+
+    /**
+     * 为商品管理页面的下拉框加载所有可用供应商
+     */
+    @RequestMapping("loadAllProviderForSelect")
+    public DataGridView loadAllProviderForSelect(){
+        QueryWrapper<Provider> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("available", Constant.AVAILABLE_TRUE);
+        List<Provider> data = providerService.list(queryWrapper);
+        return new DataGridView(data);
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.sky.erp.bus.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -31,9 +32,9 @@ public class Goods implements Serializable {
 
     private String produceplace;
 
-    private String size;
+    private String size;//商品规格
 
-    private String goodspackage;
+    private String goodspackage;//商品包装
 
     private String productcode;
 
@@ -52,6 +53,9 @@ public class Goods implements Serializable {
     private Integer available;
 
     private Integer providerid;
+
+    @TableField(exist = false)
+    private String providername;
 
 
 }
