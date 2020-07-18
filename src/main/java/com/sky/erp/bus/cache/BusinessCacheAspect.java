@@ -2,6 +2,7 @@ package com.sky.erp.bus.cache;
 
 import cn.hutool.log.Log;
 import com.sky.erp.bus.entity.Customer;
+import com.sky.erp.bus.entity.Goods;
 import com.sky.erp.bus.entity.Provider;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -39,6 +40,14 @@ public class BusinessCacheAspect {
     private static final String POINT_PROVIDER_REMOVE = "execution(* com.sky.erp.bus.service.impl.ProviderServiceImpl.removeById(..))";
     private static final String POINT_PROVIDER_REMOVE_BATCH = "execution(* com.sky.erp.bus.service.impl.ProviderServiceImpl.removeByIds(..))";
 
+    /**
+     * 商品切点表达式
+     */
+    private static final String POINT_GOODS_ADD = "execution(* com.sky.erp.bus.service.impl.GoodsServiceImpl.save(..))";
+    private static final String POINT_GOODS_UPDATE = "execution(* com.sky.erp.bus.service.impl.GoodsServiceImpl.updateById(..))";
+    private static final String POINT_GOODS_GET = "execution(* com.sky.erp.bus.service.impl.GoodsServiceImpl.getById(..))";
+    private static final String POINT_GOODS_REMOVE = "execution(* com.sky.erp.bus.service.impl.GoodsServiceImpl.removeById(..))";
+
 
 
     /**
@@ -50,10 +59,15 @@ public class BusinessCacheAspect {
      * 供应商前缀
      */
     private static final String CACHE_PROVIDER_PREFIX = "provider";
-    
-    
-    
-    
+
+    /**
+     * 商品前缀
+     */
+    private static final String CACHE_GOODS_PREFIX = "goods";
+
+
+
+
 //    ******************客户切面开始*************************************************************************************
 
     /**
@@ -128,6 +142,7 @@ public class BusinessCacheAspect {
             return cache.get(CACHE_CUSTOMER_PREFIX+arg);
         } else {
             Customer customer = (Customer)joinPoint.proceed();
+            cache.put(CACHE_CUSTOMER_PREFIX+arg,customer);
             log.info("从数据库中获取客户"+arg);
             return customer;
         }
@@ -195,7 +210,9 @@ public class BusinessCacheAspect {
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
             for (Integer id : arg) {
-                cache.remove(CACHE_PROVIDER_PREFIX+id);
+                if (cache.containsKey(CACHE_PROVIDER_PREFIX+id)){
+                    cache.remove(CACHE_PROVIDER_PREFIX+id);
+                }
             }
             log.info("已删除缓存中多个供应商"+arg.toString());
         }
@@ -213,6 +230,7 @@ public class BusinessCacheAspect {
             return cache.get(CACHE_PROVIDER_PREFIX+arg);
         } else {
             Provider provider = (Provider)joinPoint.proceed();
+            cache.put(CACHE_PROVIDER_PREFIX+arg,provider);
             log.info("从数据库中获取供应商"+arg);
             return provider;
         }
@@ -221,6 +239,76 @@ public class BusinessCacheAspect {
     
 //    ***************供应商切面结束***************************************************************************************
     
+    
+    
+    
+//    ***************商品切面开始*****************************************************************************************
+
+    /**
+     * 添加商品切入
+     */
+    @Around(POINT_GOODS_ADD)
+    public Object cacheGoodsAdd(ProceedingJoinPoint joinPoint) throws Throwable {
+        Goods arg = (Goods)joinPoint.getArgs()[0];
+        Boolean flag = (Boolean) joinPoint.proceed();
+        if (flag){
+            cache.put(CACHE_GOODS_PREFIX+arg.getId(),arg);
+            log.info("以向缓存中添加商品"+arg.getId());
+        }
+        return flag;
+    }
+
+    /**
+     * 修改商品切入
+     */
+    @Around(POINT_GOODS_UPDATE)
+    public Object cacheGoodsUpdate(ProceedingJoinPoint joinPoint) throws Throwable {
+        Goods arg = (Goods)joinPoint.getArgs()[0];
+        Boolean flag = (Boolean)joinPoint.proceed();
+        if (flag){
+            cache.put(CACHE_GOODS_PREFIX+arg.getId(),arg);
+            log.info("已更新缓存中商品"+arg.getId());
+        }
+        return flag;
+    }
+
+    /**
+     * 删除商品切入
+     */
+    @Around(POINT_GOODS_REMOVE)
+    public Object cacheGoodsDelete(ProceedingJoinPoint joinPoint) throws Throwable {
+        Integer arg = (Integer)joinPoint.getArgs()[0];
+        Boolean flag = (Boolean)joinPoint.proceed();
+        if (flag){
+            if (cache.containsKey(CACHE_GOODS_PREFIX+arg)){
+                cache.remove(CACHE_GOODS_PREFIX+arg);
+                log.info("已删除数据库和缓存中商品"+arg);
+            }
+            log.info("缓存中没有，只删除数据库中商品"+arg);
+        }
+        return flag;
+    }
+
+    /**
+     * 获取商品切入
+     */
+    @Around(POINT_GOODS_GET)
+    public Object cacheGoodsGet(ProceedingJoinPoint joinPoint) throws Throwable {
+        Integer arg = (Integer)joinPoint.getArgs()[0];
+        if (cache.containsKey(CACHE_GOODS_PREFIX+arg)){
+            log.info("从缓存中获取商品"+arg);
+            return cache.get(CACHE_GOODS_PREFIX+arg);
+        } else {
+            Goods goods = (Goods)joinPoint.proceed();
+            cache.put(CACHE_GOODS_PREFIX+arg,goods);
+            log.info("从数据库中获取商品"+arg);
+            return goods;
+        }
+    }
+    
+    
+    
+//    ***************商品切面结束*****************************************************************************************
     
     
 }
