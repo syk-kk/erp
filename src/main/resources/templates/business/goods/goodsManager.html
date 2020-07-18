@@ -116,8 +116,8 @@
                 </div>
                 <div class="layui-col-md3 layui-col-xs5">
                     <div class="layui-upload-list thumbBox mag0 magt3">
-                        <input type="hidden" name="goodsimg" id="goodsimg" value="">
-                        <img class="layui-upload-im5g thumbImg">
+                        <input type="hidden" name="goodsimg" id="goodsimg" value="defaultgoods.jpg">
+                        <img class="layui-upload-im5g thumbImg" src="/file/showImg?path=defaultgoods.jpg"/>
                     </div>
                 </div>
             </div>
@@ -231,7 +231,9 @@
                     }}
                 ,{field:'number', title:'库存量',align:'center',width:160}
                 ,{field:'dangernum', title:'预警库存',align:'center',width:160}
-                ,{field:'goodsimg', title:'商品图片',align:'center',width:300}
+                ,{field:'goodsimg', title:'商品图片',align:'center',width:300,templet:function (d) {
+                        return "<img width='60' height='40' src=/file/showImg?path="+d.goodsimg+"/>";
+                    }}
                 ,{field:'available', title:'是否可用',align:'center',width:'160',templet:function (d) {
                         return d.available==1?'<font color="green">可用</font>':'<font color="red">不可用</font>'
                     }}
@@ -306,6 +308,8 @@
                     url="/goods/addGoods";
                     //清空表单数据
                     $("#dataFrm")[0].reset();
+                    $('.thumbImg').attr('src',"/file/showImg?path=defaultgoods.jpg");
+                    $("#goodsimg").val("defaultgoods.jpg");//给隐藏域赋值
                     //给添加弹出层的下拉框加载供应商
                     $.get("/provider/loadAllProviderForSelect",function (res) {
                         var data = res.data;
@@ -330,8 +334,12 @@
                 content:$("#addOrUpdateDiv"),
                 area:['1000px'],
                 success:function(index){
+                    //清空表单数据
+                    $("#dataFrm")[0].reset();
                     url="/goods/updateGoods";
                     form.val("dataFrm",data);
+                    $('.thumbImg').attr('src',"/file/showImg?path="+data.goodsimg);
+                    $("#goodsimg").val(data.goodsimg);//给隐藏域赋值
                 }
             });
         }
@@ -395,7 +403,8 @@
             method : "post",  //此处是为了演示之用，实际使用中请将此删除，默认用post方式提交
             done: function(res, index, upload){
                 var path=res.path;
-                $('.thumbImg').attr('src','');
+                alert(path);
+                $('.thumbImg').attr('src',"/file/showImg?path="+path);
                 $('.thumbBox').css("background","#fff");
                 $("#goodsimg").val(path);//给隐藏域赋值
             }
