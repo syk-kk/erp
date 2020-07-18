@@ -78,7 +78,6 @@
 <table class="layui-hide" id="goodsTable" lay-filter="goodsTable"></table>
 <div style="display: none;" id="goodsToolBar">
     <button type="button" class="layui-btn layui-btn-sm" lay-event="add"><i class="iconfont icon-tianjiazengjiajia">添加商品</i></button>
-    <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" lay-event="deleteBatch"><i class="iconfont icon-shanchu">批量删除</i></button>
 </div>
 <div  id="goodsBar" style="display: none;">
     <a class="layui-btn layui-btn-xs" lay-event="edit"><i class="iconfont icon-xiugai">编辑</i></a>
@@ -216,8 +215,7 @@
             ,cellMinWidth:100 //设置列的最小默认宽度
             ,page: true  //是否启用分页
             ,cols: [ [   //列表数据
-                {type: 'checkbox', fixed: 'left'}
-                ,{field:'id',fixed: 'left', title:'ID',align:'center',width:100}
+                {field:'id',fixed: 'left', title:'ID',align:'center',width:100}
                 ,{field:'goodsname', title:'商品名称',align:'center',width:160}
                 ,{field:'providername', title:'供应商',align:'center',width:160}
                 ,{field:'produceplace', title:'生产地',align:'center',width:260}
@@ -252,25 +250,25 @@
 
         });
 
-        //给搜索条件的下拉框加载供应商
+        //给下拉框加载供应商
         $.get("/provider/loadAllProviderForSelect",function (res) {
             var data = res.data;
             var html = '<option value="">选择或搜索供应商</option>';
             $.each(data,function (index, item) {
                 html+="<option value='"+item.id+"'>"+item.providername+"</option>";
             });
-            $("#search_providerid").html(html);
+            $("#search_providerid").html(html);//给搜索条件初始化供应商
+            $("#addOruodata_providerid").html(html);//给添加或修改弹出层初始化供应商
             form.render('select');
         });
+
+
 
         //监听头部工具栏事件
         table.on("toolbar(goodsTable)",function(obj){
             switch(obj.event){
                 case 'add':
                     openAddGoods();
-                    break;
-                case 'deleteBatch':
-                    deleteBatch();
                     break;
             };
         })
@@ -281,7 +279,7 @@
             if(layEvent === 'del'){ //删除
                 layer.confirm('确定删除商品=['+data.goodsname+']=吗？', function(index){
                     //向服务端发送删除指令
-                    $.post("/goods/deleteGoods",{id:data.id},function(res){
+                    $.post("/goods/deleteGoods",{id:data.id,goodsimg:data.goodsimg},function(res){
                         if (res.code!=200){
                             layer.msg(res.msg);
                         } else {
@@ -310,17 +308,6 @@
                     $("#dataFrm")[0].reset();
                     $('.thumbImg').attr('src',"/file/showImg?path=defaultgoods.jpg");
                     $("#goodsimg").val("defaultgoods.jpg");//给隐藏域赋值
-                    //给添加弹出层的下拉框加载供应商
-                    $.get("/provider/loadAllProviderForSelect",function (res) {
-                        var data = res.data;
-                        var html = '<option value="">选择或搜索供应商</option>';
-                        $.each(data,function (index, item) {
-                            html+="<option value='"+item.id+"'>"+item.providername+"</option>";
-                        });
-                        $("#addOruodata_providerid").html(html);
-                        form.render('select');
-                    });
-
                 }
             });
         }
@@ -339,14 +326,15 @@
                     url="/goods/updateGoods";
                     form.val("dataFrm",data);
                     $('.thumbImg').attr('src',"/file/showImg?path="+data.goodsimg);
-                    $("#goodsimg").val(data.goodsimg);//给隐藏域赋值
                 }
             });
         }
+
         //提交
         form.on("submit(doSubmit)",function(obj){
             var params=$("#dataFrm").serialize();
             // layer.alert(url);
+            // layer.alert(params);
             $.post(url,params,function(res){
                 if (res.code!=200){
                     layer.msg(res.msg);
@@ -362,37 +350,6 @@
         });
 
 
-        //批量删除
-        function deleteBatch(){
-            //得到选中的数据行
-            var checkStatus = table.checkStatus('goodsTable');
-            var data = checkStatus.data;
-            var params="";
-            if (data.length>0){
-                $.each(data,function(i,item){
-                    if(i==0){
-                        params+="ids="+item.id;
-                    }else{
-                        params+="&ids="+item.id;
-                    }
-                });
-                layer.confirm('确定删除选中的商品吗？', function(index){
-                    //向服务端发送删除指令
-                    $.post("/goods/deleteBatchGoods",params,function(res){
-                        if (res.code!=200){
-                            layer.msg(res.msg);
-                        } else {
-                            layer.msg(res.msg);
-                            //刷新数据 表格
-                            tableIns.reload();
-                        }
-                    })
-                });
-            } else {
-                layer.msg("未选中任何数据");
-            }
-
-        }
 
         //文件上传
         upload.render({

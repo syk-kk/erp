@@ -16,8 +16,20 @@ import java.util.Properties;
 
 public class MyFileUtil {
 
-//    文件上传路径
+    /**
+     * 文件上传路径
+     */
     public static String uploadPath = "E:/upload/";
+
+    /**
+     * 临时文件标志，上传商品图片时添加该标志，只有提交后才去掉该标志
+     */
+    public static String tempFlag = "_temp";
+
+    /**
+     * 默认商品图片
+     */
+    public static String defaultGoodsImg = "defaultgoods.jpg";
 
     static {
         InputStream inputStream =
@@ -25,25 +37,41 @@ public class MyFileUtil {
         Properties properties = new Properties();
         try {
             properties.load(inputStream);
-            String value = properties.getProperty("uploadPath");
-            if (null!=value){
-                uploadPath = value;
+            String uploadPath_value = properties.getProperty("uploadPath");
+            String tempFlag_value = properties.getProperty("tempFlag");
+            String defaultGoodsImg_value = properties.getProperty("defaultGoodsImg");
+            if (null!=uploadPath_value){
+                uploadPath = uploadPath_value;
+            }
+            if (null!=tempFlag_value){
+                tempFlag = tempFlag_value;
+            }
+            if (null!=defaultGoodsImg_value){
+                defaultGoodsImg = defaultGoodsImg_value;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-//    根据旧文件名创建新文件名
+    /**
+     * 根据旧文件名创建新文件名
+     * @param oldName
+     * @return
+     */
     public static String createNewFileName(String oldName) {
 
        String suffix = oldName.substring(oldName.lastIndexOf("."),oldName.length());
 
-        return IdUtil.simpleUUID().toUpperCase()+suffix;
+        return IdUtil.simpleUUID().toUpperCase()+suffix+tempFlag;
     }
 
-
-//    文件下载
+    /**
+     * 文件下载
+     * @param path
+     * @param downloadname
+     * @return
+     */
     public static ResponseEntity<Object> downLoadFile(String path, String downloadname) {
         File file = new File(uploadPath,path);
         if (file.exists()){
@@ -58,4 +86,33 @@ public class MyFileUtil {
         return null;
 
     }
+
+    /**
+     * 文件改名
+      * @param oldname
+     */
+    public static String rename(String oldname){
+
+        //去掉临时文件标志
+        String newname = StrUtil.replace(oldname,tempFlag,"");
+
+        File file = new File(uploadPath,oldname);
+        if (file.exists()){
+            file.renameTo(new File(uploadPath,newname));
+        }
+        return newname;
+
+    }
+
+    /**
+     * 根据相对路径删除文件
+     */
+    public static void deleteFile(String path){
+        File file = new File(uploadPath,path);
+        if (file.exists()){
+            file.delete();
+        }
+    }
+
+
 }

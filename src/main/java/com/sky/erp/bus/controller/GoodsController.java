@@ -1,6 +1,9 @@
 package com.sky.erp.bus.controller;
 
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,12 +13,14 @@ import com.sky.erp.bus.service.IGoodsService;
 import com.sky.erp.bus.service.IProviderService;
 import com.sky.erp.bus.vo.GoodsVo;
 import com.sky.erp.sys.common.DataGridView;
+import com.sky.erp.sys.common.MyFileUtil;
 import com.sky.erp.sys.common.ResultObj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,27 +69,18 @@ public class GoodsController {
      * 删除商品
      */
     @RequestMapping("deleteGoods")
-    public ResultObj deleteGoods(Integer id){
+    public ResultObj deleteGoods(Integer id,String goodsimg){
         try {
+            //删除数据库中的记录
             goodsService.removeById(id);
+            //删除上传的商品图片
+            MyFileUtil.deleteFile(goodsimg);
             return ResultObj.DELETE_SUCCESS;
         } catch (Exception e){
             return ResultObj.DELETE_ERROR;
         }
     }
 
-    /**
-     * 批量删除
-     */
-    @RequestMapping("deleteBatchGoods")
-    public ResultObj deleteBatchGoods(GoodsVo goodsVo){
-        try {
-            goodsService.removeByIds(Arrays.asList(goodsVo.getIds()));
-            return ResultObj.DELETE_SUCCESS;
-        } catch (Exception e){
-            return ResultObj.DELETE_ERROR;
-        }
-    }
 
     /**
      * 修改商品
@@ -92,8 +88,21 @@ public class GoodsController {
     @RequestMapping("updateGoods")
     public ResultObj updateGoods(Goods goods){
         try {
+            if (goods.getAvailable()==null){
+                goods.setAvailable(0);
+            }
 
+            if (goods.getGoodsimg().endsWith(MyFileUtil.tempFlag)){
+                String newname = MyFileUtil.rename(goods.getGoodsimg());
+                goods.setGoodsimg(newname);
+                //删除原来的商品图片
+                String oldPath = goodsService.getById(goods.getId()).getGoodsimg();
+                if (!oldPath.equals(MyFileUtil.defaultGoodsImg)){
+                    MyFileUtil.deleteFile(oldPath);
+                }
+            }
 
+            goodsService.updateById(goods);
             return ResultObj.UPDATE_SUCCESS;
         } catch (Exception e){
             return ResultObj.UPDATE_ERROR;
@@ -107,6 +116,18 @@ public class GoodsController {
     public ResultObj addGoods(Goods goods){
         try {
 
+            if (goods.getAvailable()==null){
+                goods.setAvailable(0);
+            }
+
+            if (goods.getGoodsimg().endsWith(MyFileUtil.tempFlag)){
+                String newname = MyFileUtil.rename(goods.getGoodsimg());
+                goods.setGoodsimg(newname);
+            }
+
+
+            //保存商品信息
+            goodsService.save(goods);
 
             return ResultObj.ADD_SUCCESS;
         } catch (Exception e){
@@ -114,11 +135,6 @@ public class GoodsController {
         }
     }
 
-    /**
-     * 获取供应商
-     */
-//    public List<String> getProviderName(){
-//
-//    }
+
 
 }
