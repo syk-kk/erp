@@ -30,4 +30,20 @@ public class BusController {
     public String toGoodsManager(){
         return "business/goods/goodsManager";
     }
+
+    /**
+     * 跳转到进货管理页面
+     */
+    @RequestMapping("toInportManager")
+    public String toInportManager(){
+        return "business/inport/inportManager";
+    }
+
+    /**
+     * 跳转到退货管理页面
+     */
+    @RequestMapping("toOutportManager")
+    public String toOutportManager(){
+        return "business/outport/outportManager";
+    }
 }

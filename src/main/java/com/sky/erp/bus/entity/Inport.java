@@ -33,7 +33,7 @@ public class Inport implements Serializable {
 
     private String paytype;
 
-    private Date inporttime;
+    private Date inporttime;//进货时间
 
     private String operateperson;
 

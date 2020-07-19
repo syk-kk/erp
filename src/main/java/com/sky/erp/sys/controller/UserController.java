@@ -241,6 +241,19 @@ public class UserController {
         }
     }
 
+    /**
+     * 给进货管理页面中操作员下拉框加载数据
+     * @return
+     */
+    @RequestMapping("loadAllUserForSelect")
+    public DataGridView loadAllUserForSelect(){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("available",Constant.AVAILABLE_TRUE);
+        List<User> data = userService.list(queryWrapper);
+        return new DataGridView(data);
+
+    }
+
 
 
 

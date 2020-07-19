@@ -12,6 +12,7 @@ import com.sky.erp.bus.entity.Provider;
 import com.sky.erp.bus.service.IGoodsService;
 import com.sky.erp.bus.service.IProviderService;
 import com.sky.erp.bus.vo.GoodsVo;
+import com.sky.erp.sys.common.Constant;
 import com.sky.erp.sys.common.DataGridView;
 import com.sky.erp.sys.common.MyFileUtil;
 import com.sky.erp.sys.common.ResultObj;
@@ -27,7 +28,7 @@ import java.util.List;
 
 /**
  * <p>
- *  前端控制器
+ *  商品管理前端控制器
  * </p>
  *
  * @author syk
@@ -133,6 +134,22 @@ public class GoodsController {
         } catch (Exception e){
             return ResultObj.ADD_ERROR;
         }
+    }
+
+    /**
+     * 为进货管理页面加载商品名称下拉框数据
+     * @return
+     */
+    @RequestMapping("loadAllGoodsForSelect")
+    public DataGridView loadAllGoodsForSelect(){
+        QueryWrapper<Goods> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("available", Constant.AVAILABLE_TRUE);
+        List<Goods> data = goodsService.list();
+        for (Goods goods : data) {
+            Provider provider = providerService.getById(goods.getProviderid());
+            goods.setProvidername(provider.getProvidername());
+        }
+        return new DataGridView(data);
     }
 
 
