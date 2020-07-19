@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 /**
  * <p>
@@ -109,6 +110,8 @@ public class InportController {
         try {
             User user = (User) session.getAttribute("user");
             inport.setOperateperson(user.getName());
+
+            inport.setInporttime(new Date());
             inportService.save(inport);
             return ResultObj.ADD_SUCCESS;
         } catch (Exception e){
