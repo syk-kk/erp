@@ -20,23 +20,43 @@
 
 <blockquote class="layui-elem-quote">
     <form action="" method="post" id="searchFrm" lay-filter="searchFrm" class="layui-form layui-form-pane">
-        <div class="layui-form-item">
+        <div class="layui-form-item" align="center">
             <div class="layui-inline">
-                <label class="layui-form-label">登陆名称</label>
+                <label class="layui-form-label">供应商</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="loginname"  autocomplete="off" class="layui-input">
+                    <select name="providerid" id="search_providerid" lay-search="">
+                        <option value="">选择或搜索供应商</option>
+                    </select>
                 </div>
             </div>
             <div class="layui-inline">
-                <label class="layui-form-label">登陆地址</label>
+                <label class="layui-form-label">商品名称</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="loginip"    autocomplete="off" class="layui-input">
+                    <select name="goodsid" id="search_goodsid" lay-search="">
+                        <option value="">选择或搜索商品</option>
+                    </select>
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">开始时间</label>
                 <div class="layui-input-inline">
                     <input type="tel" name="startTime" id="startTime" readonly="readonly" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" align="center">
+            <div class="layui-inline">
+                <label class="layui-form-label">支付方式</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="paytype" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">操作员</label>
+                <div class="layui-input-inline">
+                    <select name="operateperson" id="search_operateperson" lay-search="">
+                        <option value="">选择或搜索操作员</option>
+                    </select>
                 </div>
             </div>
             <div class="layui-inline">
@@ -58,13 +78,8 @@
 <!-- 搜索条件结束 -->
 
 <!-- 数据表格开始 -->
-<table class="layui-hide" id="logInfoTable" lay-filter="logInfoTable"></table>
-<div style="display: none;" id="logInfoToolBar">
-    <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" lay-event="deleteBatch"><i class="iconfont icon-shanchu">批量删除</i></button>
-</div>
-<div  id="logInfoBar" style="display: none;">
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="iconfont icon-icon_huabanfuben">删除</i></a>
-</div>
+<table class="layui-hide" id="outportTable" lay-filter="outportTable"></table>
+
 <!-- 数据表格结束 -->
 
 
@@ -89,90 +104,67 @@
 
         //渲染数据表格
         tableIns=table.render({
-            elem: '#logInfoTable'   //渲染的目标对象
-            ,url:'/loginfo/loadAllLoginfo' //数据接口
-            ,title: '用户数据表'//数据导出来的标题
-            ,toolbar:"#logInfoToolBar"   //表格的工具条
-            ,height:'full-175'
+            elem: '#outportTable'   //渲染的目标对象
+            ,url:'/outport/loadAllOutport' //数据接口
+            ,title: '退货数据表'//数据导出来的标题
+            ,height:'full-235'
             ,cellMinWidth:100 //设置列的最小默认宽度
             ,page: true  //是否启用分页
             ,cols: [ [   //列表数据
-                {type: 'checkbox', fixed: 'left'}
-                ,{field:'id', title:'ID',align:'center'}
-                ,{field:'loginname', title:'登录名称',align:'center'}
-                ,{field:'loginip', title:'登录IP',align:'center'}
-                ,{field:'logintime', title:'登录时间',align:'center'}
-                ,{fixed: 'right', title:'操作', toolbar: '#logInfoBar',align:'center'}
+                {field:'id', fixed:'left',title:'ID',align:'center',width:50}
+                ,{field:'providername', title:'供应商',align:'center',width:120}
+                ,{field:'goodsname', title:'商品名称',align:'center',width:160}
+                ,{field:'outporttime', title:'退货时间',align:'center',width:180,sort:true}
+                ,{field:'paytype', title:'支付方式',align:'center',width:100}
+                ,{field:'number', title:'退货数量',align:'center',width:100,sort:true}
+                ,{field:'outportprice', title:'退货总价',align:'center',width:100,sort:true}
+                ,{field:'remark', title:'备注',align:'center',width:160}
+                ,{field:'operateperson', title:'操作员',align:'center'}
             ] ]
         })
         //模糊查询
         $("#doSearch").click(function(){
             var params=$("#searchFrm").serialize();
             tableIns.reload({
-                url:"/loginfo/loadAllLoginfo?"+params,
+                url:"/outport/loadAllOutport?"+params,
                 page:{curr:1}
 
             })
         });
 
-        //监听头部工具栏事件
-        table.on("toolbar(logInfoTable)",function(obj){
-            switch(obj.event){
-                case 'deleteBatch':
-                    deleteBatch();
-                    break;
-            };
-        })
-        //监听行工具事件
-        table.on('tool(logInfoTable)', function(obj){
-            var data = obj.data; //获得当前行数据
-            var layEvent = obj.event;
-            if(layEvent === 'del'){ //删除
-                layer.confirm('真的删除【'+data.loginname+'】吗？', function(index){
-                    //向服务端发送删除指令
-                    $.post("/loginfo/deleteLoginfo",{id:data.id},function(res){
-                        if (res.code!=200){
-                            layer.msg(res.msg);
-                        } else {
-                            layer.msg(res.msg);
-                            //刷新数据 表格
-                            tableIns.reload();
-                        }
-                    })
-                });
-            }
+        //给下拉框加载供应商
+        $.get("/provider/loadAllProviderForSelect",function (res) {
+            var data = res.data;
+            var html = '<option value="">选择或搜索供应商</option>';
+            $.each(data,function (index, item) {
+                html+="<option value='"+item.id+"'>"+item.providername+"</option>";
+            });
+            $("#search_providerid").html(html);//给搜索条件初始化供应商
+            form.render('select');
         });
-        //批量删除
-        function deleteBatch(){
-            //得到选中的数据行
-            var checkStatus = table.checkStatus('logInfoTable');
-            var data = checkStatus.data;
-            if (data.length>0) {
-                var params="";
-                $.each(data,function(i,item){
-                    if(i==0){
-                        params+="ids="+item.id;
-                    }else{
-                        params+="&ids="+item.id;
-                    }
-                });
-                layer.confirm('真的删除选中的登录日志吗？', function(index){
-                    //向服务端发送删除指令
-                    $.post("/loginfo/deleteBatchLoginfo",params,function(res){
-                        if (res.code!=200){
-                            layer.msg(res.msg);
-                        } else {
-                            layer.msg(res.msg);
-                            //刷新数据 表格
-                            tableIns.reload();
-                        }
-                    })
-                });
-            }else {
-                layer.msg("请先选中行");
-            }
 
-        }
+        //给搜索条件下拉框加载商品名称
+        $.get("/goods/loadAllGoodsForSelect",function (res) {
+            var data = res.data;
+            var html = '<option value="">选择或搜索商品名称</option>';
+            $.each(data,function (index, item) {
+                html+="<option value='"+item.id+"'>"+item.goodsname+"-"+item.size+"["+item.providername+"]</option>";
+            });
+            $("#search_goodsid").html(html);//给搜索条件初始化供应商
+            form.render('select');
+        });
+        //给下拉框加载操作员
+        $.get("/user/loadAllUserForSelect",function (res) {
+            var data = res.data;
+            var html = '<option value="">选择或搜索操作员</option>';
+            $.each(data,function (index, item) {
+                html+="<option value='"+item.name+"'>"+item.name+"</option>";
+            });
+            $("#search_operateperson").html(html);//给搜索条件初始化供应商
+            form.render('select');
+        });
+
+
     });
 </script>
 </body>

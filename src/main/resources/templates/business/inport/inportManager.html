@@ -141,6 +141,33 @@
 </div>
 <!-- 添加和修改的弹出层结束 -->
 
+<!--退货弹出层开始-->
+<div style="display: none;padding: 5px" id="backGoodsDiv">
+    <form action="" method="post" class="layui-form layui-form-pane" id="backFrm" lay-filter="backFrm">
+        <div class="layui-form-item">
+                <input type="hidden" name="inportid">
+                <input type="hidden" id="inportnumber" name="inportnumber">
+                <label class="layui-form-label">退货数量</label>
+                <div class="layui-input-block">
+                    <input type="text" name="number" class="layui-input" placeholder="输入退货数量" lay-verify="required|checknumber">
+                </div>
+        </div>
+        <div class="layui-form-item">
+                <label class="layui-form-label">退货备注</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="备注" name="remark" class="layui-textarea"></textarea>
+                </div>
+        </div>
+        <div class="layui-form-item" align="right">
+            <div class="layui-input-block" style="text-align: center;">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="doBackSubmit" ><span class="iconfont icon-tijiao"></span>退货</button>
+                <button type="reset" class="layui-btn layui-btn-warm"><span class="iconfont icon-zhongzhi"></span>重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<!--退货弹出层结束-->
+
 <!-- 数据表格开始 -->
 <table class="layui-hide" id="inportTable" lay-filter="inportTable"></table>
 <div style="display: none;" id="inportToolBar">
@@ -295,10 +322,42 @@
 
         //商品退货
         function back(data) {
-            $.post("",{id:data.id},function (res) {
+            layer.open({
+                type: 1,
+                title: '['+data.providername+']'+data.goodsname+'----商品退货',
+                content: $("#backGoodsDiv"),
+                area: ['500px'],
+                success: function (index) {
+                    //清空表单数据
+                    $("#backFrm")[0].reset();
+                    form.val("backFrm",{inportid:data.id,inportnumber:data.number});
+                }
 
-            })
+            });
         }
+
+        //自定义验证规则
+        form.verify({
+            checknumber: function(value){
+                if(parseInt(value)  > parseInt($("#inportnumber").val()) || parseInt(value) < 0){
+                    return '退货数量不得超出0到'+$("#inportnumber").val()+'之间';
+                }
+            }
+        });
+
+        form.on("submit(doBackSubmit)",function () {
+            var param = $("#backFrm").serialize();
+            // alert(param);
+            $.post("/outport/addOutport",param,function (res) {
+                if (res.code==200){
+                    layer.close(layer.index);
+                    layer.msg(res.msg);
+                    tableIns.reload();
+                } else {
+                    layer.msg(res.msg);
+                }
+            });
+        });
 
         
         //添加进货信息

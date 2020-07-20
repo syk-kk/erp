@@ -11,6 +11,7 @@ import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
@@ -35,7 +36,8 @@ public class Outport implements Serializable {
 
     private String paytype;
 
-    private Date outputtime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date outporttime;
 
     private String operateperson;
 
