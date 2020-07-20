@@ -350,16 +350,25 @@
                     //清空表单数据
                     $("#dataFrm")[0].reset();
                     form.val("dataFrm",data);
-                    
+                    $("#addOrupdate_providerid").attr("disabled",true);
+                    $("#addOrupdate_goodsid").attr("disabled",true);
+
+                },
+                end:function () {
+                    $("#addOrupdate_providerid").attr("disabled",false);
+                    $("#addOrupdate_goodsid").attr("disabled",false);
                 }
             });
         }
 
         //提交
         form.on("submit(doSubmit)",function(obj){
+            $("#addOrupdate_providerid").attr("disabled",false);
+            $("#addOrupdate_goodsid").attr("disabled",false);
             var params=$("#dataFrm").serialize();
             // layer.alert(url);
             // layer.alert(JSON.stringify(params));
+
             $.post(url,params,function(res){
                 if (res.code!=200){
                     layer.msg(res.msg);
