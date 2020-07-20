@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
+
 /**
  * <p>
  *  服务实现类
@@ -38,5 +40,14 @@ public class InportServiceImpl extends ServiceImpl<InportMapper, Inport> impleme
         goods.setNumber(goods.getNumber()-inport.getNumber()+entity.getNumber());
         goodsMapper.updateById(goods);
         return super.updateById(entity);
+    }
+
+    @Override
+    public boolean removeById(Serializable id) {
+        Inport inport = getById(id);
+        Goods goods = goodsMapper.selectById(inport.getGoodsid());
+        goods.setNumber(goods.getNumber()-inport.getNumber());
+        goodsMapper.updateById(goods);
+        return super.removeById(id);
     }
 }
