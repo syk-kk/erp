@@ -141,10 +141,11 @@ public class GoodsController {
      * @return
      */
     @RequestMapping("loadAllGoodsForSelect")
-    public DataGridView loadAllGoodsForSelect(){
+    public DataGridView loadAllGoodsForSelect(Integer providerid){
         QueryWrapper<Goods> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("available", Constant.AVAILABLE_TRUE);
-        List<Goods> data = goodsService.list();
+        queryWrapper.eq(providerid!=null,"providerid",providerid);
+        List<Goods> data = goodsService.list(queryWrapper);
         for (Goods goods : data) {
             Provider provider = providerService.getById(goods.getProviderid());
             goods.setProvidername(provider.getProvidername());
