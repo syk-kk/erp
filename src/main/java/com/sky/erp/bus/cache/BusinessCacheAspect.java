@@ -7,8 +7,11 @@ import com.sky.erp.bus.entity.Provider;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +22,12 @@ public class BusinessCacheAspect {
 
     private Log log = Log.get();
 
-    //缓存容器
+//    缓存容器
     private Map<String,Object> cache = new HashMap<>();
+
+//    使用redis
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
     /**
      * 客户切点表达式
@@ -78,7 +85,8 @@ public class BusinessCacheAspect {
         Customer arg = (Customer)joinPoint.getArgs()[0];
         Boolean flag = (Boolean) joinPoint.proceed();
         if (flag){
-            cache.put(CACHE_CUSTOMER_PREFIX+arg.getId(),arg);
+//            cache.put(CACHE_CUSTOMER_PREFIX+arg.getId(),arg);
+            redisTemplate.opsForValue().set(CACHE_CUSTOMER_PREFIX+arg.getId(),arg);
             log.info("以向缓存中添加客户"+arg.getId());
         }
         return flag;
@@ -92,7 +100,8 @@ public class BusinessCacheAspect {
         Customer arg = (Customer)joinPoint.getArgs()[0];
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
-            cache.put(CACHE_CUSTOMER_PREFIX+arg.getId(),arg);
+//            cache.put(CACHE_CUSTOMER_PREFIX+arg.getId(),arg);
+            redisTemplate.opsForValue().set(CACHE_CUSTOMER_PREFIX+arg.getId(),arg);
             log.info("已更新缓存中客户"+arg.getId());
         }
         return flag;
@@ -106,11 +115,17 @@ public class BusinessCacheAspect {
         Integer arg = (Integer)joinPoint.getArgs()[0];
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
-            if (cache.containsKey(CACHE_CUSTOMER_PREFIX+arg)){
-                cache.remove(CACHE_CUSTOMER_PREFIX+arg);
+//            if (cache.containsKey(CACHE_CUSTOMER_PREFIX+arg)){
+//                cache.remove(CACHE_CUSTOMER_PREFIX+arg);
+//                log.info("已删除数据库和缓存中客户"+arg);
+//            }
+            if (redisTemplate.hasKey(CACHE_CUSTOMER_PREFIX+arg)){
+                redisTemplate.delete(CACHE_CUSTOMER_PREFIX+arg);
                 log.info("已删除数据库和缓存中客户"+arg);
+            } else {
+                log.info("缓存中没有，只删除数据库中客户"+arg);
             }
-           log.info("缓存中没有，只删除数据库中客户"+arg);
+
         }
         return flag;
     }
@@ -124,9 +139,13 @@ public class BusinessCacheAspect {
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
             for (Integer id : arg) {
-                cache.remove(CACHE_CUSTOMER_PREFIX+id);
+//                cache.remove(CACHE_CUSTOMER_PREFIX+id);
+                if (redisTemplate.hasKey(CACHE_CUSTOMER_PREFIX+id)){
+                    redisTemplate.delete(CACHE_CUSTOMER_PREFIX+id);
+                    log.info("已删除缓存中客户"+id);
+                }
             }
-            log.info("已删除缓存中多个客户"+arg.toString());
+
         }
         return flag;
     }
@@ -137,12 +156,21 @@ public class BusinessCacheAspect {
     @Around(POINT_CUSTOMER_GET)
     public Object cacheCustomerGet(ProceedingJoinPoint joinPoint) throws Throwable {
         Integer arg = (Integer)joinPoint.getArgs()[0];
-        if (cache.containsKey(CACHE_CUSTOMER_PREFIX+arg)){
+//        if (cache.containsKey(CACHE_CUSTOMER_PREFIX+arg)){
+//            log.info("从缓存中获取客户"+arg);
+//            return cache.get(CACHE_CUSTOMER_PREFIX+arg);
+//        } else {
+//            Customer customer = (Customer)joinPoint.proceed();
+//            cache.put(CACHE_CUSTOMER_PREFIX+arg,customer);
+//            log.info("从数据库中获取客户"+arg);
+//            return customer;
+//        }
+        if (redisTemplate.hasKey(CACHE_CUSTOMER_PREFIX+arg)){
             log.info("从缓存中获取客户"+arg);
-            return cache.get(CACHE_CUSTOMER_PREFIX+arg);
+            return redisTemplate.opsForValue().get(CACHE_CUSTOMER_PREFIX+arg);
         } else {
             Customer customer = (Customer)joinPoint.proceed();
-            cache.put(CACHE_CUSTOMER_PREFIX+arg,customer);
+            redisTemplate.opsForValue().set(CACHE_CUSTOMER_PREFIX+arg,customer);
             log.info("从数据库中获取客户"+arg);
             return customer;
         }
@@ -164,7 +192,8 @@ public class BusinessCacheAspect {
         Provider arg = (Provider)joinPoint.getArgs()[0];
         Boolean flag = (Boolean) joinPoint.proceed();
         if (flag){
-            cache.put(CACHE_PROVIDER_PREFIX+arg.getId(),arg);
+//            cache.put(CACHE_PROVIDER_PREFIX+arg.getId(),arg);
+            redisTemplate.opsForValue().set(CACHE_PROVIDER_PREFIX+arg.getId(),arg);
             log.info("以向缓存中添加供应商"+arg.getId());
         }
         return flag;
@@ -178,7 +207,8 @@ public class BusinessCacheAspect {
         Provider arg = (Provider)joinPoint.getArgs()[0];
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
-            cache.put(CACHE_PROVIDER_PREFIX+arg.getId(),arg);
+//            cache.put(CACHE_PROVIDER_PREFIX+arg.getId(),arg);
+            redisTemplate.opsForValue().set(CACHE_PROVIDER_PREFIX+arg.getId(),arg);
             log.info("已更新缓存中供应商"+arg.getId());
         }
         return flag;
@@ -192,11 +222,17 @@ public class BusinessCacheAspect {
         Integer arg = (Integer)joinPoint.getArgs()[0];
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
-            if (cache.containsKey(CACHE_PROVIDER_PREFIX+arg)){
-                cache.remove(CACHE_PROVIDER_PREFIX+arg);
+//            if (cache.containsKey(CACHE_PROVIDER_PREFIX+arg)){
+//                cache.remove(CACHE_PROVIDER_PREFIX+arg);
+//                log.info("已删除数据库和缓存中供应商"+arg);
+//            }
+            if (redisTemplate.hasKey(CACHE_PROVIDER_PREFIX+arg)){
+                redisTemplate.delete(CACHE_PROVIDER_PREFIX+arg);
                 log.info("已删除数据库和缓存中供应商"+arg);
+            } else {
+                log.info("缓存中没有，只删除数据库中供应商"+arg);
             }
-            log.info("缓存中没有，只删除数据库中供应商"+arg);
+
         }
         return flag;
     }
@@ -210,11 +246,14 @@ public class BusinessCacheAspect {
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
             for (Integer id : arg) {
-                if (cache.containsKey(CACHE_PROVIDER_PREFIX+id)){
-                    cache.remove(CACHE_PROVIDER_PREFIX+id);
+//                if (cache.containsKey(CACHE_PROVIDER_PREFIX+id)){
+//                    cache.remove(CACHE_PROVIDER_PREFIX+id);
+//                }
+                if (redisTemplate.hasKey(CACHE_PROVIDER_PREFIX+id)){
+                    redisTemplate.delete(CACHE_PROVIDER_PREFIX+id);
+                    log.info("已删除缓存供应商"+arg.toString());
                 }
             }
-            log.info("已删除缓存中多个供应商"+arg.toString());
         }
         return flag;
     }
@@ -225,12 +264,21 @@ public class BusinessCacheAspect {
     @Around(POINT_PROVIDER_GET)
     public Object cacheProviderGet(ProceedingJoinPoint joinPoint) throws Throwable {
         Integer arg = (Integer)joinPoint.getArgs()[0];
-        if (cache.containsKey(CACHE_PROVIDER_PREFIX+arg)){
+//        if (cache.containsKey(CACHE_PROVIDER_PREFIX+arg)){
+//            log.info("从缓存中获取供应商"+arg);
+//            return cache.get(CACHE_PROVIDER_PREFIX+arg);
+//        } else {
+//            Provider provider = (Provider)joinPoint.proceed();
+//            cache.put(CACHE_PROVIDER_PREFIX+arg,provider);
+//            log.info("从数据库中获取供应商"+arg);
+//            return provider;
+//        }
+        if (redisTemplate.hasKey(CACHE_PROVIDER_PREFIX+arg)){
             log.info("从缓存中获取供应商"+arg);
-            return cache.get(CACHE_PROVIDER_PREFIX+arg);
+            return redisTemplate.opsForValue().get(CACHE_PROVIDER_PREFIX+arg);
         } else {
             Provider provider = (Provider)joinPoint.proceed();
-            cache.put(CACHE_PROVIDER_PREFIX+arg,provider);
+            redisTemplate.opsForValue().set(CACHE_PROVIDER_PREFIX+arg,provider);
             log.info("从数据库中获取供应商"+arg);
             return provider;
         }
@@ -252,7 +300,8 @@ public class BusinessCacheAspect {
         Goods arg = (Goods)joinPoint.getArgs()[0];
         Boolean flag = (Boolean) joinPoint.proceed();
         if (flag){
-            cache.put(CACHE_GOODS_PREFIX+arg.getId(),arg);
+//            cache.put(CACHE_GOODS_PREFIX+arg.getId(),arg);
+            redisTemplate.opsForValue().set(CACHE_GOODS_PREFIX+arg.getId(),arg);
             log.info("以向缓存中添加商品"+arg.getId());
         }
         return flag;
@@ -266,7 +315,8 @@ public class BusinessCacheAspect {
         Goods arg = (Goods)joinPoint.getArgs()[0];
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
-            cache.put(CACHE_GOODS_PREFIX+arg.getId(),arg);
+//            cache.put(CACHE_GOODS_PREFIX+arg.getId(),arg);
+            redisTemplate.opsForValue().set(CACHE_GOODS_PREFIX+arg.getId(),arg);
             log.info("已更新缓存中商品"+arg.getId());
         }
         return flag;
@@ -280,11 +330,17 @@ public class BusinessCacheAspect {
         Integer arg = (Integer)joinPoint.getArgs()[0];
         Boolean flag = (Boolean)joinPoint.proceed();
         if (flag){
-            if (cache.containsKey(CACHE_GOODS_PREFIX+arg)){
-                cache.remove(CACHE_GOODS_PREFIX+arg);
+//            if (cache.containsKey(CACHE_GOODS_PREFIX+arg)){
+//                cache.remove(CACHE_GOODS_PREFIX+arg);
+//                log.info("已删除数据库和缓存中商品"+arg);
+//            }
+//            log.info("缓存中没有，只删除数据库中商品"+arg);
+            if (redisTemplate.hasKey(CACHE_GOODS_PREFIX+arg)){
+                redisTemplate.delete(CACHE_GOODS_PREFIX+arg);
                 log.info("已删除数据库和缓存中商品"+arg);
+            } else {
+                log.info("缓存中没有，只删除数据库中商品"+arg);
             }
-            log.info("缓存中没有，只删除数据库中商品"+arg);
         }
         return flag;
     }
@@ -295,12 +351,21 @@ public class BusinessCacheAspect {
     @Around(POINT_GOODS_GET)
     public Object cacheGoodsGet(ProceedingJoinPoint joinPoint) throws Throwable {
         Integer arg = (Integer)joinPoint.getArgs()[0];
-        if (cache.containsKey(CACHE_GOODS_PREFIX+arg)){
+//        if (cache.containsKey(CACHE_GOODS_PREFIX+arg)){
+//            log.info("从缓存中获取商品"+arg);
+//            return cache.get(CACHE_GOODS_PREFIX+arg);
+//        } else {
+//            Goods goods = (Goods)joinPoint.proceed();
+//            cache.put(CACHE_GOODS_PREFIX+arg,goods);
+//            log.info("从数据库中获取商品"+arg);
+//            return goods;
+//        }
+        if (redisTemplate.hasKey(CACHE_GOODS_PREFIX+arg)){
             log.info("从缓存中获取商品"+arg);
-            return cache.get(CACHE_GOODS_PREFIX+arg);
+            return redisTemplate.opsForValue().get(CACHE_GOODS_PREFIX+arg);
         } else {
             Goods goods = (Goods)joinPoint.proceed();
-            cache.put(CACHE_GOODS_PREFIX+arg,goods);
+            redisTemplate.opsForValue().set(CACHE_GOODS_PREFIX+arg,goods);
             log.info("从数据库中获取商品"+arg);
             return goods;
         }
