@@ -22,8 +22,8 @@ public class BusinessCacheAspect {
 
     private Log log = Log.get();
 
-//    缓存容器
-    private Map<String,Object> cache = new HashMap<>();
+//    自定义的缓存容器，使用map存储，模拟redis
+//    private Map<String,Object> cache = new HashMap<>();
 
 //    使用redis
     @Autowired
