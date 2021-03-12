@@ -225,9 +225,11 @@
                 ,{field:'promitcode', title:'批准文号',align:'center',width:160}
                 ,{field:'description', title:'商品描述',align:'center',width:160}
                 ,{field:'price', title:'商品单价',align:'center',width:160,templet:function (d) {
-                    return d.price+"元"
+                        return d.price+"元"
                     }}
-                ,{field:'number', title:'库存量',align:'center',width:160}
+                ,{field:'number', title:'库存量',align:'center',width:160,templet:function (d) {
+                        return d.number >= d.dangernum ? '<font color="green">'+d.number+'</font>' : '<font color="red">'+d.number+'</font>';
+                    }}
                 ,{field:'dangernum', title:'预警库存',align:'center',width:160}
                 ,{field:'goodsimg', title:'商品图片',align:'center',width:300,templet:function (d) {
                         return "<img width='60' height='40' src=/file/showImg?path="+d.goodsimg+"/>";
