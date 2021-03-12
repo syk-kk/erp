@@ -27,7 +27,7 @@ spring:
     time-zone: GMT+8
 #  配置redis
   redis:
-    host: 192.168.233.131
+    host: 192.168.200.56 // 要修改为本机虚拟机上的ip
     port: 6379
     jedis:
       pool:
