@@ -13,12 +13,23 @@
     <link rel="stylesheet" href="/resources/css/public.css" media="all" />
     <link rel="icon" href="/resources/favicon.ico">
     <link rel="stylesheet" href="/resources/css/a.css" media="all">
+    <style>
+        .weather {
+            background: url(../images/weather.jpg) no-repeat left center;
+            width:250px;
+            height: 100px;
+            margin: 10px 2px 10px 6px;
+            padding: 20px 2px 2px 65px;
+            text-align: center;
+            line-height: 88px;
+        }
+    </style>
 </head>
 <body class="childrenBody">
 <blockquote class="layui-elem-quote layui-bg-green">
     <div id="nowTime"></div>
 </blockquote>
-<div class="layui-row layui-col-space10">
+<div class="layui-row layui-col-space12">
     <div class="layui-col-lg6 layui-col-md6">
         <blockquote class="layui-elem-quote title">最新公告 <i class="layui-icon layui-red">&#xe756;</i></blockquote>
         <table class="layui-table mag0" lay-skin="line">
@@ -28,6 +39,16 @@
             </colgroup>
             <tbody class="hot_news"></tbody>
         </table>
+    </div>
+    <div class="layui-col-lg6 layui-col-md6">
+        <div class="layui-card">
+            <div class="layui-card-header"><font size="4">今日天气</font></div>
+            <div class="layui-card-body">
+                <div class="weather">
+                    <iframe width="700" height="150" frameborder="0" scrolling="no" hspace="0" src="https://i.tianqi.com/?c=code&a=getcode&id=48&num=6&icon=1"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -43,6 +64,7 @@
     <div id="view_content"></div>
 </div>
 <script type="text/javascript" src="/resources/layui/layui.js"></script>
+<script type="text/javascript" src="/resources/js/jquery.min.js"></script>
 <script type="text/javascript">
 
     var time = "";
@@ -77,39 +99,22 @@
         setTimeout("getLangDate()",1000);
     }
 
-    layui.use(['form','element','layer','jquery'],function(){
-        var form = layui.form,
-            layer = parent.layer === undefined ? layui.layer : top.layer,
-            element = layui.element;
-        $ = layui.jquery;
-        //上次登录时间【此处应该从接口获取，实际使用中请自行更换】
-        $(".loginTime").html(newDate.split("日")[0]+"日</br>"+newDate.split("日")[1]);
-        //icon动画
-        $(".panel a").hover(function(){
-            $(this).find(".layui-anim").addClass("layui-anim-scaleSpring");
-        },function(){
-            $(this).find(".layui-anim").removeClass("layui-anim-scaleSpring");
-        })
-        $(".panel a").click(function(){
-            parent.addTab($(this));
-        })
-        //最新文章列表
-        $.get("/notice/loadAllNotice?page=1&limit=10",function(data){
-            var hotNewsHtml = "";
-            for(var i=0;i<3;i++){
-                hotNewsHtml += '<tr>'
-                    +'<td align="left"><a href="javascript:viewNew('+data.data[i].id+');"> '+data.data[i].title+'</a></td>'
-                    +'<td>'+data.data[i].createtime.substring(0,10)+'</td>'
-                    +'</tr>';
-            }
 
-            $(".hot_news").html(hotNewsHtml);
-            $(".userAll span").text(data.length);
-        });
+    // 公告
+    $.get("/notice/loadAllNotice?page=1&limit=10",function(data){
+        var hotNewsHtml = "";
+        for(var i=0;i<3;i++){
+            hotNewsHtml += '<tr>'
+                +'<td align="left"><a href="javascript:viewNew('+data.data[i].id+');"> '+data.data[i].title+'</a></td>'
+                +'<td>'+data.data[i].createtime.substring(0,10)+'</td>'
+                +'</tr>';
+        }
 
-
-
+        $(".hot_news").html(hotNewsHtml);
     });
+
+
+
     function viewNew(id){
         $.get("/news/loadNewById",{id:id},function(obj){
             layer.open({
