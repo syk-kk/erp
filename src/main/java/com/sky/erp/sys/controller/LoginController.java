@@ -47,7 +47,6 @@ public class LoginController {
     @RequestMapping("login")
     public ResultObj login(UserVo userVo, HttpSession session, HttpServletRequest request){
         String code = session.getAttribute("code").toString();
-        System.out.println(userVo.getLoginname()+userVo.getPwd()+userVo.getCode());
         if (code.equals(userVo.getCode())){
             Subject subject = SecurityUtils.getSubject();
             UsernamePasswordToken token = new UsernamePasswordToken(userVo.getLoginname(),userVo.getPwd());
