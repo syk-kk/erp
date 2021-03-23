@@ -14,7 +14,7 @@ import java.util.List;
  * @since 2020-07-07
  */
 public interface IUserService extends IService<User> {
-    public void saveRoleUser(Integer uid,Integer[] rids);
-    public List<Integer> getHasRoleIdsByUid(Integer uid);
+     void saveRoleUser(Integer uid,Integer[] rids);
+     List<Integer> getHasRoleIdsByUid(Integer uid);
 
 }

@@ -22,8 +22,14 @@ public class ActiveUser implements Serializable {
 
     private User user;
 
+    /**
+     * 角色集合
+     */
     private List<Role> roles = new ArrayList<>();
 
+    /**
+     * 权限集合
+     */
     private List<Permission> permissions = new ArrayList<>();
 
 }

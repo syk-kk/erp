@@ -127,7 +127,7 @@
 
         <script type="text/javascript" src="/resources/layui/layui.js"></script>
         <script type="text/javascript">
-            var tableIns;
+            var tableIns, selectTree;
             layui.extend({
                 dtree: '/resources/layui_ext/dtree/dtree'   // {/}的意思即代表采用自有路径，即不跟随 base 路径
             }).use(['jquery','form','table','layer','dtree'],function(){
@@ -174,6 +174,21 @@
                     }
                 });
 
+                //初始化下拉树
+                selectTree=dtree.renderSelect({
+                    elem: "#menuTree",
+                    width: "100%", // 可以在这里指定树的宽度来填满div
+                    dataStyle: "layuiStyle",  //使用layui风格的数据格式
+                    dataFormat: "list",  //配置data的风格为list
+                    response:{message:"msg",statusCode:0},
+                    ficon:["-1"],
+                    icon: ["2","8"],//修改response中返回数据的定义
+                    url: "/menu/loadMenuManagerLeftTreeJson" // 使用url加载（可与data加载同时存在）
+                    ,selectInputName: {
+                        nodeId: "pid",
+                    }
+                });
+
                 //模糊查询
                 $("#doSearch").click(function () {
                     var params = $("#searchFrm").serialize();
@@ -215,11 +230,6 @@
                             }
                         });
                     } else if (layEvent === 'update') { //编辑
-
-                        // layer.alert(data.id);
-                        // if (data.id==1){
-                        //     $("#menuTree").attr('disabled', 'disabled');
-                        // }
                         openUpdateMenuLayer(data);
                     }
                 });
@@ -256,9 +266,10 @@
                             $("#dataFrm")[0].reset();
                             //装载新的数据
                             form.val("dataFrm",data);
-                            //显示父级菜单
+                            //选中当前菜单所属的父级菜单
                             dtree.dataInit("menuTree", data.pid);
                             dtree.selectVal("menuTree");
+
                             url="/menu/updateMenu";
 
                         }
@@ -282,7 +293,7 @@
                                 url: "/menu/loadMenuManagerLeftTreeJson"
                             });
                             //刷新添加和修改的下拉树
-                            dtree.reload(deptTree, {
+                            dtree.reload(selectTree, {
                                 url: "/menu/loadMenuManagerLeftTreeJson"
                             });
                         }
@@ -303,7 +314,7 @@
                             //刷新左边的树
                             window.parent.left.menuTree.reload();
                             //刷新添加和修改的下拉树
-                            dtree.reload(deptTree, {
+                            dtree.reload(selectTree, {
                                 url: "/menu/loadMenuManagerLeftTreeJson"
                             });
                         }
@@ -336,7 +347,7 @@
                                     //刷新左边的树
                                     window.parent.left.menuTree.reload();
                                     //刷新添加和修改的下拉树
-                                    dtree.reload(deptTree, {
+                                    dtree.reload(selectTree, {
                                         url: "/menu/loadMenuManagerLeftTreeJson"
                                     });
                                 }
@@ -347,25 +358,6 @@
                         layer.msg("请选中要删除的行");
                     }
                 }
-
-                //初始化下拉树
-                var selectTree=dtree.renderSelect({
-                    elem: "#menuTree",
-                    width: "100%", // 可以在这里指定树的宽度来填满div
-                    dataStyle: "layuiStyle",  //使用layui风格的数据格式
-                    dataFormat: "list",  //配置data的风格为list
-                    response:{message:"msg",statusCode:0},
-                    ficon:["-1"],
-                    icon: ["2","8"],//修改response中返回数据的定义
-                    url: "/menu/loadMenuManagerLeftTreeJson" // 使用url加载（可与data加载同时存在）
-                    ,selectInputName: {
-                        nodeId: "pid",
-                    }
-                });
-                //监听点击的方法
-                // dtree.on("node(menuTree)" ,function(obj){
-                //     $("#pid").val(obj.param.nodeId);
-                // });
             });
 
             //根据树节点的传值，查询部门信息

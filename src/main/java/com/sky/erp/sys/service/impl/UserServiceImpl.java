@@ -20,20 +20,20 @@ import java.util.List;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
-    @Override
-    public User getById(Serializable id) {
-        return super.getById(id);
-    }
-
-    @Override
-    public boolean save(User entity) {
-        return super.save(entity);
-    }
-
-    @Override
-    public boolean updateById(User entity) {
-        return super.updateById(entity);
-    }
+//    @Override
+//    public User getById(Serializable id) {
+//        return super.getById(id);
+//    }
+//
+//    @Override
+//    public boolean save(User entity) {
+//        return super.save(entity);
+//    }
+//
+//    @Override
+//    public boolean updateById(User entity) {
+//        return super.updateById(entity);
+//    }
 
     @Override
     public boolean removeById(Serializable id) {

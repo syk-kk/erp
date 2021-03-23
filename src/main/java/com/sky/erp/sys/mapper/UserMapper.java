@@ -15,8 +15,8 @@ import java.util.List;
  * @since 2020-07-07
  */
 public interface UserMapper extends BaseMapper<User> {
-    public void removeRoleUserByUid(@Param("uid") Integer uid);
-    public void saveRoleUser(@Param("uid") Integer uid,@Param("rid") Integer rid);
-    public List<Integer> getHasRoleIdsByUid(@Param("uid") Integer uid);
+     void removeRoleUserByUid(@Param("uid") Integer uid);
+     void saveRoleUser(@Param("uid") Integer uid,@Param("rid") Integer rid);
+     List<Integer> getHasRoleIdsByUid(@Param("uid") Integer uid);
 
 }

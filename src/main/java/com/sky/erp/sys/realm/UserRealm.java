@@ -33,8 +33,10 @@ public class UserRealm extends AuthorizingRealm {
     @Autowired
     private IPermissionService permissionService;
 
-    /*
-    授权
+    /**
+     * 授权
+     * @param principalCollection
+     * @return
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
@@ -61,8 +63,11 @@ public class UserRealm extends AuthorizingRealm {
         return authorizationInfo;
     }
 
-    /*
-    认证
+    /**
+     * 认证
+     * @param authenticationToken
+     * @return
+     * @throws AuthenticationException
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
