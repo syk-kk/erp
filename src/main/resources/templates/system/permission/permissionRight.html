@@ -108,7 +108,7 @@
 
         <script type="text/javascript" src="/resources/layui/layui.js"></script>
         <script type="text/javascript">
-            var tableIns;
+            var tableIns, selectTree;
             layui.extend({
                 dtree: '/resources/layui_ext/dtree/dtree'   // {/}的意思即代表采用自有路径，即不跟随 base 路径
             }).use(['jquery','form','table','layer','dtree'],function(){
@@ -148,6 +148,21 @@
                     }
                 });
 
+                //初始化下拉树
+                selectTree=dtree.renderSelect({
+                    elem: "#permissionTree",
+                    width: "100%", // 可以在这里指定树的宽度来填满div
+                    dataStyle: "layuiStyle",  //使用layui风格的数据格式
+                    dataFormat: "list",  //配置data的风格为list
+                    response:{message:"msg",statusCode:0},
+                    ficon:["-1"],
+                    icon: ["2","8"],
+                    url: "/permission/loadPermissionManagerLeftTreeJson" // 使用url加载（可与data加载同时存在）
+                    ,selectInputName: {
+                        nodeId: "pid",
+                    }
+                });
+
                 //模糊查询
                 $("#doSearch").click(function () {
                     var params = $("#searchFrm").serialize();
@@ -183,11 +198,6 @@
                             deldept(url, data.id);
                         });
                     } else if (layEvent === 'update') { //编辑
-
-                        // layer.alert(data.id);
-                        // if (data.id==1){
-                        //     $("#permissionTree").attr('disabled', 'disabled');
-                        // }
                         openUpdatepermissionLayer(data);
                     }
                 });
@@ -245,14 +255,6 @@
                             layer.close(mainIndex)
                             //刷新数据 表格
                             tableIns.reload();
-                            //刷新左边的树
-                            dtree.reload(window.parent.left.permissionTree, {
-                                url: "/permission/loadPermissionManagerLeftTreeJson"
-                            });
-                            //刷新添加和修改的下拉树
-                            dtree.reload(deptTree, {
-                                url: "/permission/loadPermissionManagerLeftTreeJson"
-                            });
                         }
                     })
                     // layer.alert(JSON.stringify(params));
@@ -268,12 +270,6 @@
                             layer.msg(obj.msg);
                             //刷新数据 表格
                             tableIns.reload();
-                            //刷新左边的树
-                            window.parent.left.permissionTree.reload();
-                            //刷新添加和修改的下拉树
-                            dtree.reload(deptTree, {
-                                url: "/permission/loadPermissionManagerLeftTreeJson"
-                            });
                         }
                     });
                 }
@@ -301,12 +297,6 @@
                                     layer.msg(res.msg);
                                     //刷新数据 表格
                                     tableIns.reload();
-                                    //刷新左边的树
-                                    window.parent.left.permissionTree.reload();
-                                    //刷新添加和修改的下拉树
-                                    dtree.reload(deptTree, {
-                                        url: "/permission/loadPermissionManagerLeftTreeJson"
-                                    });
                                 }
                             })
                         });
@@ -316,21 +306,8 @@
                     }
                 }
 
-                //初始化下拉树
-                var selectTree=dtree.renderSelect({
-                    elem: "#permissionTree",
-                    width: "100%", // 可以在这里指定树的宽度来填满div
-                    dataStyle: "layuiStyle",  //使用layui风格的数据格式
-                    dataFormat: "list",  //配置data的风格为list
-                    response:{message:"msg",statusCode:0},
-                    ficon:["-1"],
-                    icon: ["2","8"],//修改response中返回数据的定义
-                    url: "/permission/loadPermissionManagerLeftTreeJson" // 使用url加载（可与data加载同时存在）
-                    ,selectInputName: {
-                        nodeId: "pid",
-                    }
-                });
-                //监听点击的方法
+
+                // 监听点击的方法 （已被另一种方式实现）
                 // dtree.on("node(permissionTree)" ,function(obj){
                 //     $("#pid").val(obj.param.nodeId);
                 // });

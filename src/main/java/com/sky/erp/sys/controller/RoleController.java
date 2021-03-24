@@ -96,7 +96,7 @@ public class RoleController {
         queryWrapper.eq("available", Constant.AVAILABLE_TRUE);
         List<Permission> permissions = permissionService.list(queryWrapper);
 
-        //根据rid查询sys_role_permission表中的pid
+        //根据角色id查询当前拥有的权限
         List<Integer> pids = roleService.queryRolePermissionIdsByRid(rid);
         List<Permission> current_permissions = null;
         if (pids.size()>0){
