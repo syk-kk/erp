@@ -216,21 +216,24 @@
                 table.on('tool(menuTable)', function (obj) {
                     var data = obj.data; //获得当前行数据
                     var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
-                    if (layEvent === 'delete') { //删除
-                        $.post("/menu/checkMenuHasChildren", {"id": data.id}, function (obj) {
-                            if (obj.code >= 0) {
-                                layer.msg("该菜单下有子菜单，请先删除子菜单");
-                            } else {
-                                url = "/menu/delMenu";
-                                layer.confirm('真的删除该菜单吗？', function (index) {
-                                    layer.close(index);
-                                    //向服务端发送删除指令
-                                    deldept(url, data.id);
-                                });
-                            }
-                        });
-                    } else if (layEvent === 'update') { //编辑
-                        openUpdateMenuLayer(data);
+                    switch (layEvent) {
+                        case 'delete':
+                            $.post("/menu/checkMenuHasChildren", {"id": data.id}, function (obj) {
+                                if (obj.code >= 0) {
+                                    layer.msg("该菜单下有子菜单，请先删除子菜单");
+                                } else {
+                                    url = "/menu/delMenu";
+                                    layer.confirm('真的删除该菜单吗？', function (index) {
+                                        layer.close(index);
+                                        //向服务端发送删除指令
+                                        deldept(url, data.id);
+                                    });
+                                }
+                            });
+                            break;
+                        case 'update':
+                            openUpdateMenuLayer(data);
+                            break;
                     }
                 });
 
